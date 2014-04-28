@@ -13,7 +13,7 @@ from creator.models import message
 
 
 def index(request):
-    latest_message_list = message.objects.all().order_by('-date')[:5]
+    latest_message_list = message.objects.all().order_by('-date')
     context = {'latest_message_list': latest_message_list}
     return render(request, 'creator/index.html', context)
 

@@ -1,38 +1,33 @@
 <head>
 
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js"></script>
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/jquery-ui.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="http://www.jeasyui.com/easyui/themes/default/easyui.css">
-	<link rel="stylesheet" type="text/css" href="http://www.jeasyui.com/easyui/themes/icon.css">
-	<link rel="stylesheet" type="text/css" href="http://www.jeasyui.com/easyui/demo/demo.css">
-	<script type="text/javascript" src="http://code.jquery.com/jquery-1.6.1.min.js"></script>
-	<script type="text/javascript" src="http://www.jeasyui.com/easyui/jquery.easyui.min.js"></script>
+    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
 
     <style>
 
-
-        #h2
+        #pageHeader
         {
             font-family: arial;
             font-size: 34;
             margin: 20px;
         }
 
-        .messagesBox    /*left*/
+        .messagesBox
         {
             width: 450px;
             margin: 20px;
             font-family: Verdana;
             font-size: 13;
+            background-color: gray;
         }
 
-        .message    /*item*/
+        .message
         {
             height: 60px;
             background: #DEDEDE;
         }
 
-        .dayOfWeek     /*right*/
+        .dayOfWeek
         {
             width: 1350px;
             background: ghostwhite;
@@ -43,15 +38,23 @@
 
         }
 
-        .dayOfWeek td.drop  /*drop*/
-        {
-            height: 60px;
-        }
+            .dayOfWeek td.drop
+            {
+                height: 70px;
+                width: 90%;
+
+            }
+
+            .dayOfWeek td.time{
+                width: 10%;
+                height: 60px;
+
+            }
 
         .dayOfWeekHeader
         {
             width: 1350px;
-            background: white;
+            /*background: white;*/
             font-size: 22;
             font-family: arial;
             border: 0px;
@@ -59,106 +62,65 @@
 
         }
 
-        .assigned{
-			background: lightgreen;
-		}
+        *[draggable=true]{
+        float:left;
+        width: 400px;
+        border: 2px solid black;
+        margin: 10px;
+        min-height:60px;
+        }
 
-        .dayOfWeek .over{
-			background:#FBEC88;
-		}
-
-
-        .trash{
-			background-color:red;
-		}
     </style>
 
-    <script type="text/javascript">
-/*
-    $( init );
-    function init() {
-        $('.messagesBox .message').draggable(
-                {
-                    cursor: 'move'
-                    revert:true,
-                    proxy:'clone'
-                }
-        );
-        $('.drop').droppable( {
-            drop: handleDropEvent
-        } );
-    }
-
-    function handleDropEvent( event, ui ) {
-        var draggable = ui.draggable;
-        ui.draggable.addClass( 'full' );
-}
-*/
-
-        $(function(){
-			$('.messagesBox .message').draggable({
-				revert:true,
-				proxy:'clone'
-			});
-			$('.dayOfWeek .drop').droppable({
-				onDragEnter:function(){
-					$(this).addClass('over');
-				},
-				onDragLeave:function(){
-					$(this).removeClass('over');
-				},
-				onDrop:function(e,source){
-					$(this).removeClass('over');
-					if ($(source).hasClass('assigned')){
-						$(this).append(source);
-					} else {
-						var c = $(source).clone().addClass('assigned');
-						$(this).empty().append(c);
-						c.draggable({
-							revert:true
-						});
-					}
-				}
-			});
-			$('.messagesBox').droppable({
-				accept:'.assigned',
-				onDragEnter:function(e,source){
-					$(source).addClass('trash');
-				},
-				onDragLeave:function(e,source){
-					$(source).removeClass('trash');
-				},
-				onDrop:function(e,source){
-					$(source).remove();
-				}
-			});
-		});
-
-
-</script>
 </head>
 
-<p id="h2">Раписание научной конференции "ПаВТ-2014"</p>
+
+<p id="pageHeader">Раписание научной конференции "ПаВТ-2014"</p>
+
+<br>
 
 <table align="left" border="1" class="dayOfWeek">
+
     <tr>
         <td class="dayOfWeekHeader">
-            Понедельник
+            Понедельник<br> 1 сентября
         </td>
     </tr>
+
+
     <tr>
+        <td class="time"></td>
         <td class="drop"></td>
     </tr>
     <tr>
-        <td class="drop">
-            блаблалаааааа
-        </td>
+        <td class="time"></td>
+        <td class="drop"></td>
     </tr>
     <tr>
-        <td class="drop">
-            блаблалааааааааааааааа
-        </td>
+        <td class="time"></td>
+        <td class="drop"></td>
     </tr>
+    <tr>
+        <td class="time"></td>
+        <td class="drop"></td>
+    </tr>
+    <tr>
+        <td class="time"></td>
+        <td class="drop"></td>
+    </tr>
+    <tr>
+        <td class="time"></td>
+        <td class="drop"></td>
+    </tr><tr>
+        <td class="time"></td>
+        <td class="drop"></td>
+    </tr>
+    <tr>
+        <td class="time"></td>
+        <td class="drop"></td>
+    </tr>
+
+
 
 </table>
 
@@ -167,13 +129,71 @@
 
         {% for message in latest_message_list %}
             <tr>
-                <td><div class="message">{{ message.topic }}
+                <td><div class="message" draggable="true">{{ message.topic }}
                 <br><i>{{ message.name }}</i></div></td>
             </tr>
         {% endfor %}
 
     </table>
+
+
 {% else %}
     <p>No messages are available.</p>
 {% endif %}
+
+<br><br>
+<table align="left" border="1" class="dayOfWeek" >
+
+    <tr>
+        <td class="dayOfWeekHeader">
+            Вторник<br>
+            2 сентября
+        </td>
+    </tr>
+
+
+    <tr>
+        <td class="time"></td>
+        <td class="drop"></td>
+    </tr>
+    <tr>
+        <td class="time"></td>
+        <td class="drop"></td>
+    </tr>
+    <tr>
+        <td class="time"></td>
+        <td class="drop"></td>
+    </tr>
+    <tr>
+        <td class="time"></td>
+        <td class="drop"></td>
+    </tr>
+    <tr>
+        <td class="time"></td>
+        <td class="drop"></td>
+    </tr>
+    <tr>
+        <td class="time"></td>
+        <td class="drop"></td>
+    </tr><tr>
+        <td class="time"></td>
+        <td class="drop"></td>
+    </tr>
+    <tr>
+        <td class="time"></td>
+        <td class="drop"></td>
+    </tr>
+
+
+
+</table>
+
+<script type="text/javascript">
+     $( ".message" ).draggable({
+         drag: function(){
+             $(this).height(50).width(300);
+         }
+     });
+     $( "td.drop" ).droppable();
+</script>
 
