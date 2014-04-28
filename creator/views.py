@@ -9,11 +9,11 @@ from django.http import Http404
 # Create your views here.
 from django.http import HttpResponse
 
-from creator.models import message
+from creator.models import report
 
 
 def index(request):
-    latest_message_list = message.objects.all().order_by('-date')
+    latest_message_list = report.objects.all().order_by('-RName')
     context = {'latest_message_list': latest_message_list}
     return render(request, 'creator/index.html', context)
 

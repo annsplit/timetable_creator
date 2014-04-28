@@ -1,16 +1,44 @@
 from django.contrib import admin
 
 # Register your models here.
-from creator.models import message
+from creator.models import report, conference, section, time
 
 
 
-class message_admin(admin.ModelAdmin):
+class report_admin(admin.ModelAdmin):
     fieldsets = [
-        ('Topic',               {'fields': ['topic']}),
-        ('Name of scientist', {'fields': ['name']}),
-        ('Date', {'fields': ['date']}),
+        ('Topic',               {'fields': ['RName']}),
+        ('Name of scientist',   {'fields': ['Person']}),
+        ('Person',              {'fields': ['Sponsor']}),
+        ('Section',              {'fields': ['SID']}),
     ]
-    list_display = ('topic', 'name', 'date')
+    list_display = ('RName', 'Person', 'Sponsor')
 
-admin.site.register(message, message_admin)
+
+class conference_admin(admin.ModelAdmin):
+    fieldsets = [
+        ('Name', {'fields': ['CName']}),
+        ('Start date', {'fields': ['StartDate']}),
+        ('End date', {'fields': ['EndDate']})
+    ]
+
+
+class section_admin(admin.ModelAdmin):
+    fieldsets = [
+        ('Name', {'fields': ['SName']}),
+        ('Person', {'fields': ['Person']}),
+        ('date', {'fields': ['Date']}),
+        ('Conference', {'fields': ['Conference']}),
+        ('Time', {'fields': ['Time']})
+    ]
+
+
+class time_admin(admin.ModelAdmin):
+    fieldsets = [
+        ('Count', {'fields': ['Count']})
+    ]
+
+admin.site.register(report, report_admin)
+admin.site.register(conference, conference_admin)
+admin.site.register(section, section_admin)
+admin.site.register(time, time_admin)

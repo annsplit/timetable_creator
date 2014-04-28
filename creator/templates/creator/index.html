@@ -2,6 +2,9 @@
 
     <script src="//code.jquery.com/jquery-1.10.2.js"></script>
     <script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
+
+
 
     <style>
 
@@ -12,44 +15,34 @@
             margin: 20px;
         }
 
-        .messagesBox
+        #messagesBox
         {
             width: 450px;
             margin: 20px;
             font-family: Verdana;
             font-size: 13;
-            background-color: gray;
+            background-color: lightblue;
+            float: right;
         }
 
         .message
         {
             height: 60px;
-            background: #DEDEDE;
+            width: 300px;
+            background: white;
         }
 
         .dayOfWeek
         {
-            width: 1350px;
-            background: ghostwhite;
+            width: 1200px;
             margin: 20px;
             font-family: Verdana;
             font-size: 13;
-            padding: 15px;
-
+            background-color: lightgoldenrodyellow;
+            float: left;
+            padding: 10px;
         }
 
-            .dayOfWeek td.drop
-            {
-                height: 70px;
-                width: 90%;
-
-            }
-
-            .dayOfWeek td.time{
-                width: 10%;
-                height: 60px;
-
-            }
 
         .dayOfWeekHeader
         {
@@ -62,138 +55,66 @@
 
         }
 
-        *[draggable=true]{
-        float:left;
-        width: 400px;
-        border: 2px solid black;
-        margin: 10px;
-        min-height:60px;
+        #messageList, .timegrid{
+            list-style-type: none;
+            padding: 5px;
+            float: left;
+            margin: 5px;
+            position: relative;
+            width: 500px;
+            min-height: 100px;
         }
 
-    </style>
+        #messageList li, .timegrid li {
+            margin: 10px;
+            padding: 5px;
+            width: 400px;
+            min-height: 60px;
+            position: relative;
+        }
+  </style>
 
 </head>
 
 
-<p id="pageHeader">Раписание научной конференции "ПаВТ-2014"</p>
+
+<script>
+    $(function() {
+        $( "#messageList, .timegrid" ).sortable({
+            connectWith: ".connectedSortable"
+        }).disableSelection();
+    });
+</script>
+
+
+<p id="pageHeader">Раписание научной конференции {{ conference.CName }}</p>
 
 <br>
 
-<table align="left" border="1" class="dayOfWeek">
 
-    <tr>
-        <td class="dayOfWeekHeader">
-            Понедельник<br> 1 сентября
-        </td>
-    </tr>
+<div class="dayOfWeek">
+    <div class="dayOfWeekHeader">Понедельник, {{ conference.StartDate }}</div>
+    <ul class="connectedSortable timegrid">
+        Перетащите доклады/мероприятия сюда
+    </ul>
+</div>
 
-
-    <tr>
-        <td class="time"></td>
-        <td class="drop"></td>
-    </tr>
-    <tr>
-        <td class="time"></td>
-        <td class="drop"></td>
-    </tr>
-    <tr>
-        <td class="time"></td>
-        <td class="drop"></td>
-    </tr>
-    <tr>
-        <td class="time"></td>
-        <td class="drop"></td>
-    </tr>
-    <tr>
-        <td class="time"></td>
-        <td class="drop"></td>
-    </tr>
-    <tr>
-        <td class="time"></td>
-        <td class="drop"></td>
-    </tr><tr>
-        <td class="time"></td>
-        <td class="drop"></td>
-    </tr>
-    <tr>
-        <td class="time"></td>
-        <td class="drop"></td>
-    </tr>
-
-
-
-</table>
-
+<div id="messagesBox">
 {% if latest_message_list %}
-    <table align="right" class="messagesBox">
+    <ul id="messageList" class="connectedSortable">
 
-        {% for message in latest_message_list %}
-            <tr>
-                <td><div class="message" draggable="true">{{ message.topic }}
-                <br><i>{{ message.name }}</i></div></td>
-            </tr>
+        {% for report in latest_message_list %}
+            <li class="message">
+                {{ report.RName }}
+                <br><i>{{ report.Person }}</i>
+            </li>
         {% endfor %}
 
-    </table>
+    </ul>
 
 
 {% else %}
     <p>No messages are available.</p>
 {% endif %}
 
-<br><br>
-<table align="left" border="1" class="dayOfWeek" >
-
-    <tr>
-        <td class="dayOfWeekHeader">
-            Вторник<br>
-            2 сентября
-        </td>
-    </tr>
-
-
-    <tr>
-        <td class="time"></td>
-        <td class="drop"></td>
-    </tr>
-    <tr>
-        <td class="time"></td>
-        <td class="drop"></td>
-    </tr>
-    <tr>
-        <td class="time"></td>
-        <td class="drop"></td>
-    </tr>
-    <tr>
-        <td class="time"></td>
-        <td class="drop"></td>
-    </tr>
-    <tr>
-        <td class="time"></td>
-        <td class="drop"></td>
-    </tr>
-    <tr>
-        <td class="time"></td>
-        <td class="drop"></td>
-    </tr><tr>
-        <td class="time"></td>
-        <td class="drop"></td>
-    </tr>
-    <tr>
-        <td class="time"></td>
-        <td class="drop"></td>
-    </tr>
-
-
-
-</table>
-
-<script type="text/javascript">
-     $( ".message" ).draggable({
-         drag: function(){
-             $(this).height(50).width(300);
-         }
-     });
-     $( "td.drop" ).droppable();
-</script>
-
+</div>
