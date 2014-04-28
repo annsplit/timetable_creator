@@ -77,11 +77,11 @@
 </head>
 
 
-
 <script>
     $(function() {
         $( "#messageList, .timegrid" ).sortable({
-            connectWith: ".connectedSortable"
+            connectWith: ".connectedSortable",
+            placeholder: "ui-state-highlight"
         }).disableSelection();
     });
 </script>
@@ -100,6 +100,7 @@
 </div>
 
 <div id="messagesBox">
+Список докладов:
 {% if latest_message_list %}
     <ul id="messageList" class="connectedSortable">
 
