@@ -87,13 +87,13 @@
 </script>
 
 
-<p id="pageHeader">Раписание научной конференции {{ conference.CName }}</p>
+<p id="pageHeader">Раписание научной конференции {{ conference_name }}</p>
 
 <br>
 
 
 <div class="dayOfWeek">
-    <div class="dayOfWeekHeader">Понедельник, {{ conference.StartDate }}</div>
+    <div class="dayOfWeekHeader">Понедельник, {{ conference_name.StartDate }}</div>
     <ul class="connectedSortable timegrid">
         Перетащите доклады/мероприятия сюда
     </ul>
@@ -101,10 +101,10 @@
 
 <div id="messagesBox">
 Список докладов:
-{% if latest_message_list %}
+{% if message_list %}
     <ul id="messageList" class="connectedSortable">
 
-        {% for report in latest_message_list %}
+        {% for report in message_list %}
             <li class="message">
                 {{ report.RName }}
                 <br><i>{{ report.Person }}</i>

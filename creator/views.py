@@ -9,12 +9,15 @@ from django.http import Http404
 # Create your views here.
 from django.http import HttpResponse
 
-from creator.models import report
+from creator.models import report, conference
 
 
 def index(request):
-    latest_message_list = report.objects.all().order_by('-RName')
-    context = {'latest_message_list': latest_message_list}
+    message_list = report.objects.all().order_by('-RName')
+    conference_name = conference.objects.first()
+    context = {'message_list': message_list,
+               'conference_name': conference_name
+    }
     return render(request, 'creator/index.html', context)
 
 #def detail(request, poll_id):
