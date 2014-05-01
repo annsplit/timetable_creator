@@ -72,6 +72,21 @@
             min-height: 60px;
             position: relative;
         }
+
+        .sectional {
+            background-color: greenyellow;
+            width: 800px;
+        }
+
+        .plenary {
+            background-color: mediumpurple;
+            width: 800px;
+        }
+
+        .simple{
+            background-color: whitesmoke;
+            width: 800px;
+        }
   </style>
 
 </head>
@@ -103,6 +118,9 @@
             </li>
         {% endfor %}
 
+
+
+
     </ul>
 
 
@@ -116,12 +134,40 @@
 {% for x in date_list %}
 <div class="dayOfWeek">
     <div class="dayOfWeekHeader">{{ x|date:"l, " }}{{ x }}</div>
-    <ul class="connectedSortable timegrid">
-        Перетащите доклады/мероприятия сюда
-    </ul>
+
+
+        {% for section in section_list %}
+            {% if x == section.Date and section.SName == "Пленарные" %}
+                <ul class="connectedSortable timegrid plenary">
+                    {{ section.SName }}
+                    <br><i>{{ section.Person }}</i>
+                    <br><i>{{ section.Date }}</i>
+                    <br><i>{{ section.StartTime }}</i>
+                    <br><br>Перетащите доклады сюда
+                </ul>
+
+
+            {% elif x == section.Date and section.SName == "Секционные" %}
+                <ul class="connectedSortable timegrid sectional">
+                    {{ section.SName }}
+                    <br><i>{{ section.Person }}</i>
+                    <br><i>{{ section.Date }}</i>
+                    <br><i>{{ section.StartTime }}</i>
+                    <br><br>Перетащите доклады сюда
+                </ul>
+
+
+            {% elif x == section.Date %}
+                <ul class="timegrid simple">
+                    <li> {{ section.SName }}, {{ section.Date }}, {{ section.StartTime }}</li>
+                </ul>
+            {% endif %}
+        {% endfor %}
+
 </div>
 {% endfor %}
 
 
-
-
+{% comment %}
+{{ form }}
+{% endcomment %}

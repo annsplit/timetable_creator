@@ -21,8 +21,9 @@ class section(models.Model):
     SName = models.CharField(max_length=200)
     Person = models.CharField(max_length=200, null=True)
     Conference = models.ForeignKey(conference)
-    Time = models.ForeignKey(time)
-    Date = models.DateTimeField()
+    TimeCount = models.ForeignKey(time)
+    Date = models.DateField()
+    StartTime = models.TimeField()
     def __unicode__(self):  # Python 3: def __str__(self):
         return self.SName
 

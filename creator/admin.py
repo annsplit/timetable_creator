@@ -28,8 +28,9 @@ class section_admin(admin.ModelAdmin):
         ('Name', {'fields': ['SName']}),
         ('Person', {'fields': ['Person']}),
         ('date', {'fields': ['Date']}),
+        ('StartTime', {'fields': ['StartTime']}),
         ('Conference', {'fields': ['Conference']}),
-        ('Time', {'fields': ['Time']})
+        ('TimeCount', {'fields': ['TimeCount']})
     ]
 
 

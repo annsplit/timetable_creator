@@ -1,5 +1,6 @@
 from django.shortcuts import render
-from datetime import  timedelta
+from datetime import timedelta
+from django import forms
 # Create your views here.
 from django.shortcuts import render, get_object_or_404
 from django.http import Http404
@@ -9,8 +10,11 @@ from django.http import Http404
 # Create your views here.
 from django.http import HttpResponse
 
-from creator.models import report, conference
+from creator.models import report, conference, section
 
+class LoginForm(forms.Form):
+    username = forms.CharField(label=u'name')
+    password = forms.CharField(label=u'pass', widget=forms.PasswordInput())
 
 def index(request):
     message_list = report.objects.all().order_by('-RName')
@@ -20,9 +24,15 @@ def index(request):
     date_list.append(conference_name.StartDate)
     for i in range(1, diff.days+1):
         date_list.append(conference_name.StartDate + timedelta(days=i))
+    section_list = section.objects.all().order_by('Date', 'StartTime')
+
+    form = LoginForm()
+
     context = {'message_list': message_list,
                'conference_name': conference_name,
-               'date_list': date_list
+               'date_list': date_list,
+               'form': form,
+               'section_list': section_list
     }
     return render(request, 'creator/index.html', context)
 
