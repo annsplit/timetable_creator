@@ -91,14 +91,6 @@
 
 <br>
 
-
-<div class="dayOfWeek">
-    <div class="dayOfWeekHeader">Понедельник, {{ conference_name.StartDate }}</div>
-    <ul class="connectedSortable timegrid">
-        Перетащите доклады/мероприятия сюда
-    </ul>
-</div>
-
 <div id="messagesBox">
 Список докладов:
 {% if message_list %}
@@ -115,7 +107,21 @@
 
 
 {% else %}
-    <p>No messages are available.</p>
+    <p>No reports.</p>
 {% endif %}
 
 </div>
+
+
+{% for x in date_list %}
+<div class="dayOfWeek">
+    <div class="dayOfWeekHeader">{{ x|date:"l, " }}{{ x }}</div>
+    <ul class="connectedSortable timegrid">
+        Перетащите доклады/мероприятия сюда
+    </ul>
+</div>
+{% endfor %}
+
+
+
+
