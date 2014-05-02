@@ -19,7 +19,9 @@ class conference_admin(admin.ModelAdmin):
     fieldsets = [
         ('Name', {'fields': ['CName']}),
         ('Start date', {'fields': ['StartDate']}),
-        ('End date', {'fields': ['EndDate']})
+        ('End date', {'fields': ['EndDate']}),
+        ('daystart', {'fields': ['DayStart']}),
+        ('dayend', {'fields': ['DayEnd']})
     ]
 
 

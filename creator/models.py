@@ -7,6 +7,8 @@ class conference(models.Model):
     CName = models.CharField(max_length=200)
     StartDate = models.DateField()
     EndDate = models.DateField()
+    DayStart = models.TimeField()
+    DayEnd = models.TimeField()
     def __unicode__(self):  # Python 3: def __str__(self):
         return self.CName
 
@@ -31,7 +33,7 @@ class section(models.Model):
 class report(models.Model):
     RName = models.CharField(max_length=200)
     Person = models.CharField(max_length=200)
-    Sponsor = models.CharField(max_length=200, null=True)
-    SID = models.ForeignKey(section)
+    Sponsor = models.CharField(max_length=200, blank=True)
+    SID = models.ForeignKey(section, blank=True)
     def __unicode__(self):  # Python 3: def __str__(self):
         return self.RName
