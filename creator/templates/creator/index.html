@@ -17,20 +17,18 @@
 
         #messagesBox
         {
-            width: 450px;
+            width: 600px;
             margin: 20px;
             font-family: Verdana;
             font-size: 13;
             background-color: lightblue;
             float: right;
+            height: 80%;
+            position: fixed;
+            right: 20px;
         }
 
-        .message
-        {
-            height: 60px;
-            width: 300px;
-            background: white;
-        }
+
 
         .dayOfWeek
         {
@@ -47,7 +45,6 @@
         .dayOfWeekHeader
         {
             width: 1350px;
-            /*background: white;*/
             font-size: 22;
             font-family: arial;
             border: 0px;
@@ -60,32 +57,82 @@
             padding: 5px;
             float: left;
             margin: 5px;
-            position: relative;
-            width: 500px;
+            width: 550px;
             min-height: 100px;
         }
 
         #messageList li, .timegrid li {
             margin: 10px;
             padding: 5px;
-            width: 400px;
-            min-height: 60px;
-            position: relative;
+
+            min-height: 40px;
+            height: auto;
         }
 
+
+        .message {
+
+            width: 300px;
+            background: white;
+            float: left;
+            position: relative;
+
+        }
         .sectional {
-            background-color: greenyellow;
-            width: 800px;
+
+            width: 500px;
+
+            float: left;
+            margin-top: -0.3px;
+
         }
 
         .plenary {
-            background-color: mediumpurple;
-            width: 800px;
+
+            width: 500px;
+            float: left;
+
         }
 
         .simple{
             background-color: whitesmoke;
-            width: 800px;
+            width: 450px;
+            float: left;
+            margin-left: -5px;
+        }
+
+        .time{
+            list-style: none;
+
+            margin-right: 20px;
+        }
+
+        .timetext{
+            font-size: 8px;
+
+            position: absolute;
+        }
+
+        .timedrop{
+            border: 1px solid white;
+            list-style: none;
+            margin-top: -5px;
+        }
+
+        .resizablePlenary{
+            background-color: mediumpurple;
+            width: 500px;
+            float: left;
+            position: relative;
+            padding: 5px;
+        }
+
+        .resizableSectional{
+            background-color: greenyellow;
+            width: 500px;
+            position: relative;
+            float: left;
+            margin-top: -0.3px;
         }
   </style>
 
@@ -94,11 +141,20 @@
 
 <script>
     $(function() {
-        $( "#messageList, .timegrid" ).sortable({
+        $( "#messageList, .timegrid, .plenary, .simple, .sectional, .timedrop" ).sortable({
             connectWith: ".connectedSortable",
             placeholder: "ui-state-highlight"
         }).disableSelection();
     });
+
+    jQuery(function() {
+        jQuery(" .resizablePlenary, .resizableSectional").resizable({minWidth: "300", minHeight: "100"});
+    });
+
+    jQuery(function() {
+        jQuery(".message").resizable({minWidth: "300"});
+    });
+
 </script>
 
 
@@ -118,6 +174,36 @@
             </li>
         {% endfor %}
 
+        {% for section in section_list %}
+            {% if section.SName == "Пленарные"%}
+                <li class="resizablePlenary">
+                    <ul class="connectedSortable timegrid plenary">
+                        {{ section.SName }}
+                        <br><i>{{ section.Person }}</i>
+
+                        <br><br>Перетащите доклады сюда
+                    </ul>
+                </li>
+
+
+            {% elif section.SName == "Секционные" %}
+                <li class="resizableSectional">
+                    <ul class="connectedSortable timegrid sectional">
+                        {{ section.SName }}
+                        <br><i>{{ section.Person }}</i>
+                        <br><br>Перетащите доклады сюда
+                    </ul>
+                </li>
+
+            {% else %}
+                <li>
+                    <ul class="timegrid simple">
+                    <li> {{ section.SName }}, {{ section.Date }}, {{ section.StartTime }}</li>
+                </ul>
+                </li>
+            {% endif %}
+        {% endfor %}
+
 
 
 
@@ -135,34 +221,42 @@
 <div class="dayOfWeek">
     <div class="dayOfWeekHeader">{{ x|date:"l, " }}{{ x }}</div>
 
-
-        {% for section in section_list %}
-            {% if x == section.Date and section.SName == "Пленарные" %}
-                <ul class="connectedSortable timegrid plenary">
-                    {{ section.SName }}
-                    <br><i>{{ section.Person }}</i>
-                    <br><i>{{ section.Date }}</i>
-                    <br><i>{{ section.StartTime }}</i>
-                    <br><br>Перетащите доклады сюда
-                </ul>
-
-
-            {% elif x == section.Date and section.SName == "Секционные" %}
-                <ul class="connectedSortable timegrid sectional">
-                    {{ section.SName }}
-                    <br><i>{{ section.Person }}</i>
-                    <br><i>{{ section.Date }}</i>
-                    <br><i>{{ section.StartTime }}</i>
-                    <br><br>Перетащите доклады сюда
-                </ul>
+        {% for y in time_list %}
+        <div class="time">
+            <div class="timetext">{{ y|time:"H:i " }}</div>
+            <ul class=" connectedSortable timedrop">
+            {% comment %}
+            {% for section in section_list %}
+                {% if x == section.Date and section.SName == "Пленарные" and y == section.StartTime %}
+                    <ul class="connectedSortable timegrid plenary">
+                        {{ section.SName }}
+                        <br><i>{{ section.Person }}</i>
+                        <br><i>{{ section.Date }}</i>
+                        <br><i>{{ section.StartTime }}</i>
+                        <br><br>Перетащите доклады сюда
+                    </ul>
 
 
-            {% elif x == section.Date %}
-                <ul class="timegrid simple">
-                    <li> {{ section.SName }}, {{ section.Date }}, {{ section.StartTime }}</li>
-                </ul>
-            {% endif %}
+                {% elif x == section.Date and section.SName == "Секционные" and y == section.StartTime %}
+                    <ul class="connectedSortable timegrid sectional">
+                        {{ section.SName }}
+                        <br><i>{{ section.Person }}</i>
+                        <br><i>{{ section.Date }}</i>
+                        <br><i>{{ section.StartTime }}</i>
+                        <br><br>Перетащите доклады сюда
+                    </ul>
+
+
+                {% elif x == section.Date and y == section.StartTime %}
+                    <ul class="timegrid simple">
+                        <li> {{ section.SName }}, {{ section.Date }}, {{ section.StartTime }}</li>
+                    </ul>
+                {% endif %}
+            {% endfor %}
+            {% endcomment %}
+            </ul></div>
         {% endfor %}
+
 
 </div>
 {% endfor %}
