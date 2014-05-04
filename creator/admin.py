@@ -32,7 +32,9 @@ class section_admin(admin.ModelAdmin):
         ('date', {'fields': ['Date']}),
         ('StartTime', {'fields': ['StartTime']}),
         ('Conference', {'fields': ['Conference']}),
-        ('TimeCount', {'fields': ['TimeCount']})
+        ('TimeCount', {'fields': ['TimeCount']}),
+        ('x', {'fields': ['x_pos']}),
+        ('y', {'fields': ['y_pos']}),
     ]
 
 

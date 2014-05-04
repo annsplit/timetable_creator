@@ -26,6 +26,8 @@ class section(models.Model):
     TimeCount = models.ForeignKey(time)
     Date = models.DateField()
     StartTime = models.TimeField()
+    x_pos = models.FloatField(default=0)
+    y_pos = models.FloatField(default=0)
     def __unicode__(self):  # Python 3: def __str__(self):
         return self.SName
 
