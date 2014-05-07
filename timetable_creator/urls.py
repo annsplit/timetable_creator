@@ -10,4 +10,7 @@ urlpatterns = patterns('',
 
     url(r'^admin/', include(admin.site.urls)),
     url(r'^timetable/', include('creator.urls', namespace="timetable")),
+
+
+
 )

@@ -24,8 +24,7 @@ class section(models.Model):
     Person = models.CharField(max_length=200, null=True)
     Conference = models.ForeignKey(conference)
     TimeCount = models.ForeignKey(time)
-    Date = models.DateField()
-    StartTime = models.TimeField()
+    StartTime = models.DateTimeField()
     x_pos = models.FloatField(default=0)
     y_pos = models.FloatField(default=0)
     def __unicode__(self):  # Python 3: def __str__(self):

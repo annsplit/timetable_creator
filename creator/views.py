@@ -9,13 +9,17 @@ from django.http import Http404
 
 
 # Create your views here.
-from django.http import HttpResponse
-
+from django.http import HttpResponse, QueryDict
 from creator.models import report, conference, section
+from django.views.decorators.csrf import csrf_exempt
+from datetime import time
+import urllib
+
 
 class LoginForm(forms.Form):
     username = forms.CharField(label=u'name')
     password = forms.CharField(label=u'pass', widget=forms.PasswordInput())
+
 
 def index(request):
     message_list = report.objects.all().order_by('-RName')
@@ -28,7 +32,7 @@ def index(request):
     for i in range(1, diff.days+1):
         date_list.append(conference_name.StartDate + timedelta(days=i))
 
-    section_list = section.objects.all().order_by('Date', 'StartTime')
+    section_list = section.objects.all().order_by('StartTime')
 
     time_list = []
     start = conference_name.DayStart.strftime('%H:%M')
@@ -53,8 +57,25 @@ def index(request):
                'form': form,
                'section_list': section_list,
                'time_list': time_list
+
     }
     return render(request, 'creator/index.html', context)
+
+
+@csrf_exempt
+def save(request):
+    if request.method == 'POST':
+        times = request.POST
+        for t in times:
+            print(t)
+            my = section.objects.get(id=t)
+            param = "%Y-%m-%d %H:%M:%S"
+            newtime = datetime.strptime(times[t], param)
+            print(my.StartTime)
+            my.StartTime = newtime
+            print(my.StartTime)
+            my.save(update_fields=['StartTime'])
+    return HttpResponse('Success')
 
 #def detail(request, poll_id):
  #   poll = get_object_or_404(Poll, pk=poll_id)

@@ -2,6 +2,7 @@
 
     <script src="//code.jquery.com/jquery-1.10.2.js"></script>
     <script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+    <script src="//js/settings.js" type="text/javascript"></script>
 
 
     <link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
@@ -11,6 +12,9 @@
     <style>
 
         .my{
+        }
+
+        .dayHeader{
 
         }
 
@@ -152,12 +156,24 @@
     var sections_array = {};
 
     {% for section in section_list %}
-        sections_array[{{section.id}}] = {
-                SName: "{{ section.SName }}",
-                STime: "{{ section.StartTime }}"
-        };
+        sections_array[{{section.id}}] = "{{ section.StartTime|date:"Y-m-d H:m:s" }}"
+        ;
     {% endfor %}
 
+    function saveTimetable(){
+        $.ajax({
+            type: 'POST',
+            traditional: true,
+            data: sections_array,
+            url: '/timetable/save/',
+            success: function() {
+                alert("perfect!");
+            },
+            error: function() {
+                alert("err :c");
+            }
+        });
+    }
 
     $(function() {
         $( "#messageList, .timegrid, .plenary, .simple, .sectional, .timedrop" ).sortable({
@@ -165,15 +181,16 @@
             placeholder: "ui-state-highlight",
             update: function(){
                 var time=$(this).prev().text();
+                var date_source=$(this).closest("div.dayOfWeek").find(".dayHeader").val();
+                //var date=date_source.split(', ')
+                alert(date_source)
                 var section_id=$(this).find("input[type=hidden]").val();
 
-                for (var i=1; i<Object.keys(sections_array).length; i++)
+                for (var i=1; i<Object.keys(sections_array).length+1; i++)
                     if (i == section_id ){
-                        sections_array[i].STime = time;
-                        alert(sections_array[i].STime);
+                        sections_array[i] = date_source + " " + time + ":00" ;
+                        alert(sections_array[i])
                     }
-
-
             }
         }).disableSelection();
     });
@@ -189,14 +206,25 @@
 
 
 
+
+
 </script>
+
+
+
+
 </head>
 
 <body >
-
+<input onclick="saveTimetable();" type=button id="submit" value="Сохранить расписание">
 <p id="pageHeader">Раписание научной конференции <b>"{{ conference_name }}"</b></p>
 
 <br>
+<script>
+
+    for (var i=1; i<Object.keys(sections_array).length+1; i++)
+        document.write(sections_array[i])
+</script>
 
 <div id="messagesBox">
 Список докладов и секций:
@@ -215,7 +243,7 @@
 
         {% for section in section_list %}
 
-            {% if section.SName == "Пленарные" and section.Date == "" %}
+            {% if section.SName == "Пленарные" and section.StartTime == "" %}
                 <li class="resizablePlenary">
                     <ul class="connectedSortable timegrid plenary">
                         {{ section.SName }}
@@ -225,13 +253,9 @@
                     </ul>
                 </li>
 
-                <script>
-                    //if ({{ section.x_pos }}>0.0){
-                      //  $("li:last").offset({ top: sections_array[{{ section.id }}].x, left:  sections_array[{{ section.id }}].y });
-                    //}
-                </script>
 
-            {% elif section.SName == "Секционные" and section.Date == ""%}
+
+            {% elif section.SName == "Секционные" and section.StartTime == ""%}
                 <li class="resizableSectional">
                     <ul class="connectedSortable timegrid sectional">
                         {{ section.SName }}
@@ -240,15 +264,13 @@
                     </ul>
                 </li>
 
-            {% elif section.Date == "" %}
+            {% elif section.StartTime == "" %}
                 <li>
                     <ul class="timegrid simple">
-                    <li> {{ section.SName }}, {{ section.Date }}, {{ section.StartTime }}</li>
+                    <li> {{ section.SName }}, {{ section.StartTime }}</li>
                 </ul>
                 </li>
-                <script>
-                    //$("li:last").offset({ top: sections_array[{{ section.id }}].x, left:  sections_array[{{ section.id }}].y });
-                </script>
+
             {% endif %}
             <script></script>
         {% endfor %}
@@ -268,40 +290,41 @@
 
 {% for day in date_list %}
 <div class="dayOfWeek">
-    <div class="dayOfWeekHeader">{{ day|date:"l, " }}{{ day }}</div>
+    <div class="dayOfWeekHeader" >{{ day|date:"l, " }}{{ day }}<input type="hidden" class="dayHeader" name="day" value="{{ day|date:"Y-m-d" }}"></div>
 
         {% for stime in time_list %}
 
         <div class="time">
-            <div class="timetext">{{ stime|time:"H:i " }}</div>
+            <div class="timetext">{{ stime|time:"H:i" }}</div>
             <ul class=" connectedSortable timedrop">
                 {%  for section in section_list %}
-
-                    {% if section.StartTime == stime and section.SName == "Пленарные" and section.Date == day %}
+                    {% if section.StartTime|time:"H:i" == stime|time:"H:i" and section.SName == "Пленарные" and section.StartTime.date == day %}
                         <li class="resizablePlenary">
                             <ul class="connectedSortable timegrid plenary">
-                                <input type="hidden" class="my" name="SID" value="{{ section.id }}">
+
                                 {{ section.SName }}
                                 <br><i>{{ section.Person }}</i>
 
                                 <br><br>Перетащите доклады сюда
+                                <input type="hidden" class="my" name="SID" value="{{ section.id }}">
                             </ul>
                         </li>
 
 
-                    {% elif section.StartTime == stime and section.SName == "Секционные" and section.Date == day %}
+                    {% elif section.StartTime|time:"H:i" == stime|time:"H:i"  and section.SName == "Секционные" and section.StartTime.date == day %}
                         <li class="resizableSectional">
                             <ul class="connectedSortable timegrid sectional">
-                                <input type="hidden" class="my" name="SID" value="{{ section.id }}">
+
                                 {{ section.SName }}
                                 <br><i>{{ section.Person }}</i>
 
                                 <br><br>Перетащите доклады сюда
+                                <input type="hidden" class="my" name="SID" value="{{ section.id }}">
                             </ul>
                         </li>
 
 
-                    {% elif section.StartTime == stime and section.Date == day %}
+                    {% elif section.StartTime|time:"H:i" == stime|time:"H:i"  and section.StartTime.date == day %}
                         <li class="">
                             <ul class="timegrid simple">
                                 {{ section.SName }}
@@ -317,6 +340,8 @@
 
 </div>
 {% endfor %}
+
+
 
 
 {% comment %}
