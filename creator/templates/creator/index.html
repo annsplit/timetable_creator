@@ -14,6 +14,10 @@
         .my{
         }
 
+        #submit{
+            margin: 20px;
+        }
+
         .dayHeader{
 
         }
@@ -154,10 +158,13 @@
 
 <script>
     var sections_array = {};
+    var sections_width = {};
+    var sections_height = {};
 
     {% for section in section_list %}
-        sections_array[{{section.id}}] = "{{ section.StartTime|date:"Y-m-d H:m:s" }}"
-        ;
+        sections_array[{{section.id}}] = "{{ section.StartTime|date:"Y-m-d H:m:s" }}";
+        sections_width[{{ section.id }}] = {{ section.x_pos }};
+        sections_height[{{ section.id }}] = {{ section.y_pos }};
     {% endfor %}
 
     function saveTimetable(){
@@ -167,12 +174,37 @@
             data: sections_array,
             url: '/timetable/save/',
             success: function() {
-                alert("perfect!");
+                alert("Временная сетка (положения) успешно сохранена");
             },
             error: function() {
-                alert("err :c");
+                alert("Ошибка при сохранении положений");
             }
         });
+        $.ajax({
+            type: 'POST',
+            traditional: true,
+            data: sections_width,
+            url: '/timetable/save_width/',
+            success: function() {
+                alert("Временная сетка (ширина) успешно сохранена");
+            },
+            error: function() {
+                alert("Ошибка при сохранении ширины");
+            }
+        });
+        $.ajax({
+            type: 'POST',
+            traditional: true,
+            data: sections_height,
+            url: '/timetable/save_height/',
+            success: function() {
+                alert("Временная сетка (высота) успешно сохранена");
+            },
+            error: function() {
+                alert("Ошибка при сохранении высоты");
+            }
+        });
+
     }
 
     $(function() {
@@ -180,29 +212,51 @@
             connectWith: ".connectedSortable",
             placeholder: "ui-state-highlight",
             update: function(){
-                var time=$(this).prev().text();
+                var time=$(this).closest("div.time").find(".timetext").text();
                 var date_source=$(this).closest("div.dayOfWeek").find(".dayHeader").val();
-                //var date=date_source.split(', ')
-                alert(date_source)
                 var section_id=$(this).find("input[type=hidden]").val();
 
                 for (var i=1; i<Object.keys(sections_array).length+1; i++)
                     if (i == section_id ){
                         sections_array[i] = date_source + " " + time + ":00" ;
-                        alert(sections_array[i])
+
                     }
             }
         }).disableSelection();
     });
 
     jQuery(function() {
-        jQuery(" .resizablePlenary, .resizableSectional").resizable({minWidth: "300", minHeight: "100"});
+        jQuery(" .resizablePlenary, .resizableSectional").resizable({
+            minWidth: "300",
+            minHeight: "100",
+            stop: function(){
+                var width = $(this).width();
+                var height = $(this).height();
+                var section_id=$(this).find("input[type=hidden]").val();
+                for (var i=1; i<Object.keys(sections_array).length+1; i++)
+                    if (i == section_id ){
+                        sections_width[i] = width;
+                        sections_height[i] = height;
+                    }
+            }
+        });
     });
 
     jQuery(function() {
         jQuery(".message").resizable({minWidth: "300"});
     });
 
+    document.ready($(function(){
+        for (var i=1; i<Object.keys(sections_array).length+1; i++){
+            v = i.toString();
+            if (sections_width[i] > 0)
+                $('#'+v).css("width", sections_width[i]);
+            if (sections_height[i] > 0)
+                $('#'+v).css("height", sections_height[i]);
+
+        }
+    })
+    );
 
 
 
@@ -216,15 +270,11 @@
 </head>
 
 <body >
-<input onclick="saveTimetable();" type=button id="submit" value="Сохранить расписание">
+
 <p id="pageHeader">Раписание научной конференции <b>"{{ conference_name }}"</b></p>
 
+<input onclick="saveTimetable();" type=button id="submit" value="Сохранить временную сетку">
 <br>
-<script>
-
-    for (var i=1; i<Object.keys(sections_array).length+1; i++)
-        document.write(sections_array[i])
-</script>
 
 <div id="messagesBox">
 Список докладов и секций:
@@ -298,40 +348,41 @@
             <div class="timetext">{{ stime|time:"H:i" }}</div>
             <ul class=" connectedSortable timedrop">
                 {%  for section in section_list %}
-                    {% if section.StartTime|time:"H:i" == stime|time:"H:i" and section.SName == "Пленарные" and section.StartTime.date == day %}
-                        <li class="resizablePlenary">
-                            <ul class="connectedSortable timegrid plenary">
+                    {% if section.StartTime|time:"H:i" == stime|time:"H:i" and section.StartTime.date == day %}
+                        {% if section.SName == "Пленарные" %}
+                            <li class="resizablePlenary" id="{{ section.id }}">
+                                <ul class="connectedSortable timegrid plenary">
 
-                                {{ section.SName }}
-                                <br><i>{{ section.Person }}</i>
+                                    {{ section.SName }}
+                                    <br><i>{{ section.Person }}</i>
 
-                                <br><br>Перетащите доклады сюда
-                                <input type="hidden" class="my" name="SID" value="{{ section.id }}">
-                            </ul>
-                        </li>
-
-
-                    {% elif section.StartTime|time:"H:i" == stime|time:"H:i"  and section.SName == "Секционные" and section.StartTime.date == day %}
-                        <li class="resizableSectional">
-                            <ul class="connectedSortable timegrid sectional">
-
-                                {{ section.SName }}
-                                <br><i>{{ section.Person }}</i>
-
-                                <br><br>Перетащите доклады сюда
-                                <input type="hidden" class="my" name="SID" value="{{ section.id }}">
-                            </ul>
-                        </li>
+                                    <br><br>Перетащите доклады сюда
+                                    <input type="hidden" class="my" name="SID" value="{{ section.id }}">
+                                </ul>
+                            </li>
 
 
-                    {% elif section.StartTime|time:"H:i" == stime|time:"H:i"  and section.StartTime.date == day %}
-                        <li class="">
-                            <ul class="timegrid simple">
-                                {{ section.SName }}
-                            </ul>
-                        </li>
+                        {% elif section.SName == "Секционные" %}
+                            <li class="resizableSectional" id="{{ section.id }}">
+                                <ul class="connectedSortable timegrid sectional">
+
+                                    {{ section.SName }}
+                                    <br><i>{{ section.Person }}</i>
+
+                                    <br><br>Перетащите доклады сюда
+                                    <input type="hidden" class="my" name="SID" value="{{ section.id }}">
+                                </ul>
+                            </li>
+
+
+                        {% else %}
+                            <li class="" id="{{ section.id }}">
+                                <ul class="timegrid simple">
+                                    {{ section.SName }}
+                                </ul>
+                            </li>
+                        {% endif %}
                     {% endif %}
-
                 {% endfor %}
 
             </ul></div>

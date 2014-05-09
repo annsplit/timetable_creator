@@ -6,7 +6,9 @@ from creator import views
 urlpatterns = patterns('',
     # ex: /polls/
     url(r'^$', views.index, name='index'),
-    url(r'^save/$', views.save, name='save')
+    url(r'^save/$', views.save, name='save'),
+    url(r'^save_width/$', views.save_width, name='save_width'),
+    url(r'^save_height/$', views.save_height, name='save_height')
 
     # ex: /polls/5/
     #url(r'^(?P<message_id>\d+)/$', views.detail, name='detail'),

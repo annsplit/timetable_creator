@@ -67,16 +67,37 @@ def save(request):
     if request.method == 'POST':
         times = request.POST
         for t in times:
-            print(t)
             my = section.objects.get(id=t)
             param = "%Y-%m-%d %H:%M:%S"
             newtime = datetime.strptime(times[t], param)
-            print(my.StartTime)
             my.StartTime = newtime
-            print(my.StartTime)
             my.save(update_fields=['StartTime'])
     return HttpResponse('Success')
 
+@csrf_exempt
+def save_width(request):
+    if request.method == 'POST':
+        width = request.POST
+        for w in width:
+            if (width[w] > 0):
+                sect = section.objects.get(id=w)
+                newwidth = width[w]
+                sect.x_pos = newwidth
+                sect.save(update_fields=['x_pos'])
+    return HttpResponse('Success')
+
+
+@csrf_exempt
+def save_height(request):
+    if request.method == 'POST':
+        height = request.POST
+        for h in height:
+            if (height[h] > 0):
+                sect = section.objects.get(id=h)
+                newheight = height[h]
+                sect.y_pos = newheight
+                sect.save(update_fields=['y_pos'])
+    return HttpResponse('Success')
 #def detail(request, poll_id):
  #   poll = get_object_or_404(Poll, pk=poll_id)
   #  return render(request, 'polls/detail.html', {'poll': poll})
