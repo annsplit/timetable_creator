@@ -98,6 +98,20 @@ def save_height(request):
                 sect.y_pos = newheight
                 sect.save(update_fields=['y_pos'])
     return HttpResponse('Success')
+
+
+@csrf_exempt
+def save_reports(request):
+    if request.method == 'POST':
+        positions = request.POST
+        for p in positions:
+            if (positions[p] > 0):
+                rep = report.objects.get(id=p)
+                newpos = positions[p]
+                rep.SID_id = newpos
+                rep.save(update_fields=['SID_id'])
+    return HttpResponse('Success')
+
 #def detail(request, poll_id):
  #   poll = get_object_or_404(Poll, pk=poll_id)
   #  return render(request, 'polls/detail.html', {'poll': poll})

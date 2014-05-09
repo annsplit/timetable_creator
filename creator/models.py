@@ -35,6 +35,8 @@ class report(models.Model):
     RName = models.CharField(max_length=200)
     Person = models.CharField(max_length=200)
     Sponsor = models.CharField(max_length=200, blank=True)
-    SID = models.ForeignKey(section, blank=True)
+    SID = models.ForeignKey(section, null=True, blank=True)
+    x_pos = models.FloatField(default=0)
+    y_pos = models.FloatField(default=0)
     def __unicode__(self):  # Python 3: def __str__(self):
         return self.RName

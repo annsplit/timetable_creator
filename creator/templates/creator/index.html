@@ -161,10 +161,24 @@
     var sections_width = {};
     var sections_height = {};
 
+    var reports_array = {};
+    var reports_width = {};
+    var reports_height = {};
+
     {% for section in section_list %}
         sections_array[{{section.id}}] = "{{ section.StartTime|date:"Y-m-d H:m:s" }}";
         sections_width[{{ section.id }}] = {{ section.x_pos }};
         sections_height[{{ section.id }}] = {{ section.y_pos }};
+    {% endfor %}
+
+    {% for report in message_list %}
+        {% if  report.SID_id  == None %}
+            reports_array[{{ report.id }}]  = 0;
+        {% else %}
+            reports_array[{{ report.id }}] = {{ report.SID_id }}
+        {% endif %}
+        reports_width[{{ report.id }}] = {{ report.x_pos }};
+        reports_height[{{ report.id }}] = {{ report.y_pos }};
     {% endfor %}
 
     function saveTimetable(){
@@ -205,6 +219,19 @@
             }
         });
 
+        $.ajax({
+            type: 'POST',
+            traditional: true,
+            data: reports_array,
+            url: '/timetable/save_reports/',
+            success: function() {
+                alert("Временная сетка (доклады) успешно сохранена");
+            },
+            error: function() {
+                alert("Ошибка при сохранении докладов");
+            }
+        });
+
     }
 
     $(function() {
@@ -212,15 +239,27 @@
             connectWith: ".connectedSortable",
             placeholder: "ui-state-highlight",
             update: function(){
-                var time=$(this).closest("div.time").find(".timetext").text();
-                var date_source=$(this).closest("div.dayOfWeek").find(".dayHeader").val();
-                var section_id=$(this).find("input[type=hidden]").val();
+                if ($(this).children().is('.message')){
+                    var sid = $(this).closest(".sid_class").attr('id');
+                    var report_id = $(this).children().attr('id');
+                    report_id = report_id.replace("r","");
+                    int_report_id = +report_id;
+                    for (var i=1; i<Object.keys(reports_array).length+1; i++)
+                        if (i == int_report_id ){
+                            reports_array[i] = sid;
+                        }
+                }
+                else {
+                    var time=$(this).closest("div.time").find(".timetext").text();
+                    var date_source=$(this).closest("div.dayOfWeek").find(".dayHeader").val();
+                    var section_id=$(this).find("input[type=hidden]").val();
 
-                for (var i=1; i<Object.keys(sections_array).length+1; i++)
-                    if (i == section_id ){
-                        sections_array[i] = date_source + " " + time + ":00" ;
+                    for (var i=1; i<Object.keys(sections_array).length+1; i++)
+                        if (i == section_id ){
+                            sections_array[i] = date_source + " " + time + ":00" ;
 
-                    }
+                        }
+                }
             }
         }).disableSelection();
     });
@@ -282,7 +321,7 @@
     <ul id="messageList" class="connectedSortable">
 
         {% for report in message_list %}
-            <li class="message">
+            <li class="message" id="r{{ report.id }}">
                 {{ report.RName }}
                 <br><i>{{ report.Person }}</i>
             </li>
@@ -350,7 +389,7 @@
                 {%  for section in section_list %}
                     {% if section.StartTime|time:"H:i" == stime|time:"H:i" and section.StartTime.date == day %}
                         {% if section.SName == "Пленарные" %}
-                            <li class="resizablePlenary" id="{{ section.id }}">
+                            <li class="resizablePlenary sid_class" id="{{ section.id }}">
                                 <ul class="connectedSortable timegrid plenary">
 
                                     {{ section.SName }}
@@ -363,7 +402,7 @@
 
 
                         {% elif section.SName == "Секционные" %}
-                            <li class="resizableSectional" id="{{ section.id }}">
+                            <li class="resizableSectional  sid_class" id="{{ section.id }}">
                                 <ul class="connectedSortable timegrid sectional">
 
                                     {{ section.SName }}
