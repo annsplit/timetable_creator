@@ -115,6 +115,31 @@ def save_reports(request):
                 rep.save(update_fields=['SID_id'])
     return HttpResponse('Success')
 
+
+@csrf_exempt
+def save_reports_width(request):
+    if request.method == 'POST':
+        width = request.POST
+        for w in width:
+            if (width[w] > 0):
+                rep = report.objects.get(id=w)
+                newwidth = width[w]
+                rep.y_pos = newwidth
+                rep.save(update_fields=['x_pos'])
+    return HttpResponse('Success')
+
+
+@csrf_exempt
+def save_reports_height(request):
+    if request.method == 'POST':
+        height = request.POST
+        for h in height:
+            if (height[h] > 0):
+                rep = report.objects.get(id=h)
+                newheight = height[h]
+                rep.y_pos = newheight
+                rep.save(update_fields=['y_pos'])
+    return HttpResponse('Success')
 #def detail(request, poll_id):
  #   poll = get_object_or_404(Poll, pk=poll_id)
   #  return render(request, 'polls/detail.html', {'poll': poll})

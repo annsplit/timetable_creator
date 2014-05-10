@@ -11,6 +11,8 @@ class report_admin(admin.ModelAdmin):
         ('Name of scientist',   {'fields': ['Person']}),
         ('Person',              {'fields': ['Sponsor']}),
         ('Section',              {'fields': ['SID']}),
+        ('x_pos',              {'fields': ['x_pos']}),
+        ('y_pos',              {'fields': ['y_pos']}),
     ]
     list_display = ('RName', 'Person', 'Sponsor')
 

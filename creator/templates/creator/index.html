@@ -238,6 +238,31 @@
                 alert("Ошибка при сохранении докладов");
             }
         });
+        $.ajax({
+            type: 'POST',
+            traditional: true,
+            data: reports_width,
+            url: '/timetable/save_reports_width/',
+            success: function() {
+                alert("Временная сетка (доклады ширина) успешно сохранена");
+            },
+            error: function() {
+                alert("Ошибка при сохранении докладов ширина");
+            }
+        });
+        $.ajax({
+            type: 'POST',
+            traditional: true,
+            data: reports_height,
+            url: '/timetable/save_reports_height/',
+            success: function() {
+                alert("Временная сетка (доклады высота) успешно сохранена");
+            },
+            error: function() {
+                alert("Ошибка при сохранении докладов высота");
+            }
+        });
+
 
     }
 
@@ -303,7 +328,21 @@
     });
 
     jQuery(function() {
-        jQuery(".message").resizable({minWidth: "300"});
+        jQuery(".message").resizable({
+            minWidth: "300",
+            stop: function(){
+                var width = $(this).width();
+                var height = $(this).height();
+                var report_id = $(this).attr('id');
+                report_id = report_id.replace("r","");
+                int_report_id = +report_id;
+                for (var i=1; i<Object.keys(reports_array).length+1; i++)
+                    if (i == int_report_id){
+                        reports_width[i] = width;
+                        reports_height[i] = height;
+                    }
+            }
+        });
     });
 
     document.ready($(function(){
@@ -313,6 +352,14 @@
                 $('#'+v).css("width", sections_width[i]);
             if (sections_height[i] > 0)
                 $('#'+v).css("height", sections_height[i]);
+
+        }
+        for (var i=1; i<Object.keys(reports_array).length+1; i++){
+            v = i.toString();
+            if (reports_width[i] > 0)
+                $('#r'+v).css("width", reports_width[i]);
+            if (reports_height[i] > 0)
+                $('#r'+v).css("height", reports_height[i]);
 
         }
     })

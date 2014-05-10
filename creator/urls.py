@@ -9,7 +9,9 @@ urlpatterns = patterns('',
     url(r'^save/$', views.save, name='save'),
     url(r'^save_width/$', views.save_width, name='save_width'),
     url(r'^save_height/$', views.save_height, name='save_height'),
-    url(r'^save_reports/$', views.save_reports, name='save_reports')
+    url(r'^save_reports/$', views.save_reports, name='save_reports'),
+    url(r'^save_reports_width/$', views.save_reports_width, name='save_reports_width'),
+    url(r'^save_reports_height/$', views.save_reports_height, name='save_reports_height')
 
     # ex: /polls/5/
     #url(r'^(?P<message_id>\d+)/$', views.detail, name='detail'),
