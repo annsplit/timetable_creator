@@ -105,11 +105,13 @@ def save_reports(request):
     if request.method == 'POST':
         positions = request.POST
         for p in positions:
+            rep = report.objects.get(id=p)
             if (positions[p] > '0'):
-                rep = report.objects.get(id=p)
                 newpos = positions[p]
+            else:
+                newpos = None;
+            if (rep.SID_id != newpos):
                 rep.SID_id = newpos
-                print(newpos)
                 rep.save(update_fields=['SID_id'])
     return HttpResponse('Success')
 
