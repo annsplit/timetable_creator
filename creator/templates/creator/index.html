@@ -110,10 +110,8 @@
         }
 
         .simple{
-            background-color: whitesmoke;
             width: 450px;
             float: left;
-            margin-left: -5px;
         }
 
         .time{
@@ -145,6 +143,15 @@
 
         .resizableSectional{
             background-color: greenyellow;
+            width: 500px;
+            position: relative;
+            float: left;
+            margin-top: -0.3px;
+            border: 1px solid white;
+        }
+
+        .resizableSimple{
+            background-color: ghostwhite;
             width: 500px;
             position: relative;
             float: left;
@@ -279,7 +286,7 @@
     });
 
     jQuery(function() {
-        jQuery(" .resizablePlenary, .resizableSectional").resizable({
+        jQuery(" .resizablePlenary, .resizableSectional, .resizableSimple").resizable({
             minWidth: "300",
             minHeight: "100",
             stop: function(){
@@ -331,7 +338,7 @@
 
 <div id="messagesBox" class="sid_class">
 Список докладов и секций:
-{% if message_list %}
+{% if message_list or section_list %}
     <ul id="messageList" class="connectedSortable">
 
         {% for report in message_list %}
@@ -348,32 +355,52 @@
 
         {% for section in section_list %}
 
-            {% if section.SName == "Пленарные" and section.StartTime == "" %}
-                <li class="resizablePlenary">
+            {% if section.SName == "Пленарные" and section.StartTime == None %}
+                <li class="resizablePlenary sid_class" id="{{ section.id }}">
                     <ul class="connectedSortable timegrid plenary">
-                        {{ section.SName }}
-                        <br><i>{{ section.Person }}{{ section.x_pos }}</i>
-
-                        <br><br>Перетащите доклады сюда
-                    </ul>
-                </li>
-
-
-
-            {% elif section.SName == "Секционные" and section.StartTime == ""%}
-                <li class="resizableSectional">
-                    <ul class="connectedSortable timegrid sectional">
                         {{ section.SName }}
                         <br><i>{{ section.Person }}</i>
                         <br><br>Перетащите доклады сюда
+                        {% for report in message_list %}
+                            {% if report.SID_id == section.id %}
+                                <li class="message" id="r{{ report.id }}">
+                                {{ report.RName }}
+                                <br><i>{{ report.Person }}</i>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        <input type="hidden" class="my" name="SID" value="{{ section.id }}">
                     </ul>
                 </li>
 
-            {% elif section.StartTime == "" %}
-                <li>
+
+
+            {% elif section.SName == "Секционные" and section.StartTime == None%}
+                 <li class="resizableSectional  sid_class" id="{{ section.id }}">
+                     <ul class="connectedSortable timegrid sectional">
+                         {{ section.SName }}
+                         <br><i>{{ section.Person }}</i>
+                         <br><br>Перетащите доклады сюда
+                         {% for report in message_list %}
+                             {% if report.SID_id == section.id %}
+                                 <li class="message" id="r{{ report.id }}">
+                                     {{ report.RName }}
+                                     <br><i>{{ report.Person }}</i>
+                                 </li>
+                             {% endif %}
+                         {% endfor %}
+                         <input type="hidden" class="my" name="SID" value="{{ section.id }}">
+                     </ul>
+                 </li>
+
+            {% elif section.StartTime == None %}
+                <li class="resizableSimple sid_class" id="{{ section.id }}">
                     <ul class="timegrid simple">
-                    <li> {{ section.SName }}, {{ section.StartTime }}</li>
-                </ul>
+                        {{ section.SName }}
+                        <br><i>{{ section.Person }}</i>
+                        <input type="hidden" class="my" name="SID" value="{{ section.id }}">
+                    </ul>
                 </li>
 
             {% endif %}
@@ -448,9 +475,11 @@
 
 
                         {% else %}
-                            <li class="" id="{{ section.id }}">
+                            <li class="resizableSimple sid_class" id="{{ section.id }}">
                                 <ul class="timegrid simple">
                                     {{ section.SName }}
+                                    <br><i>{{ section.Person }}</i>
+                                    <input type="hidden" class="my" name="SID" value="{{ section.id }}">
                                 </ul>
                             </li>
                         {% endif %}
