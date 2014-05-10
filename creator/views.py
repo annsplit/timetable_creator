@@ -69,7 +69,10 @@ def save(request):
         for t in times:
             my = section.objects.get(id=t)
             param = "%Y-%m-%d %H:%M:%S"
-            newtime = datetime.strptime(times[t], param)
+            if (times[t] == ""):
+                newtime = None
+            else:
+                newtime = datetime.strptime(times[t], param)
             my.StartTime = newtime
             my.save(update_fields=['StartTime'])
     return HttpResponse('Success')

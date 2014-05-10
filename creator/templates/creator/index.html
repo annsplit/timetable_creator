@@ -173,7 +173,12 @@
     var reports_height = {};
 
     {% for section in section_list %}
-        sections_array[{{section.id}}] = "{{ section.StartTime|date:"Y-m-d H:m:s" }}";
+        {%  if section.StartTime == None %}
+            sections_array[{{section.id}}] = "";
+        {% else %}
+            sections_array[{{section.id}}] = "{{ section.StartTime|date:"Y-m-d H:m:s" }}";
+        {% endif %}
+
         sections_width[{{ section.id }}] = {{ section.x_pos }};
         sections_height[{{ section.id }}] = {{ section.y_pos }};
     {% endfor %}
@@ -267,16 +272,18 @@
     }
 
     $(function() {
-        $( "#messageList, .timegrid, .plenary, .simple, .sectional, .timedrop" ).sortable({
+        $( "#messageList, .timegrid, .timedrop" ).sortable({
             connectWith: ".connectedSortable",
             placeholder: "ui-state-highlight",
             start: function(event, ui) {
                 var drag_id = ui.item.attr('id');
+
                 ui.item.data('drag_id', drag_id);
             },
             update: function(event, ui){
                 var drag_id = ui.item.data('drag_id');
-                if ($(this).children().is('.message')){
+                var dest = event.target.id;
+                if (drag_id.indexOf("r") > -1){
                     var sid = $(this).closest(".sid_class").attr('id');
                     if (sid[0] == "m"){
                         sid = 0;
@@ -288,23 +295,27 @@
                         if (i == int_report_id ){
                             reports_array[i] = sid;
                         }
-
                 }
                 else {
-                    //if(false){
+                        if (dest == "messageList"){
+                        var time = "";
+                        var date_source = "";
+                    }
 
-                    //}
-                    //else{
-                    var time=$(this).closest("div.time").find(".timetext").text();
-                    var date_source=$(this).closest("div.dayOfWeek").find(".dayHeader").val();
+                    else{
+                        var time=$(this).closest("div.time").find(".timetext").text();
+                        var date_source=$(this).closest("div.dayOfWeek").find(".dayHeader").val();
+                    }
                     var section_id=$(this).find("input[type=hidden]").val();
 
                     for (var i=1; i<Object.keys(sections_array).length+1; i++)
                         if (i == section_id ){
-                            sections_array[i] = date_source + " " + time + ":00" ;
-
+                            if (time!= "")
+                                sections_array[i] = date_source + " " + time + ":00" ;
+                            else
+                                sections_array[i] = "";
                         }
-                    //}
+
                 }
             }
         }).disableSelection();
@@ -386,7 +397,7 @@
 <div id="messagesBox" class="sid_class">
 Список докладов и секций:
 {% if message_list or section_list %}
-    <ul id="messageList" class="connectedSortable">
+    <ul id="messageList" class="connectedSortable box_class">
 
         {% for report in message_list %}
             {% if report.SID_id == None %}
@@ -468,7 +479,7 @@
 
 
 {% for day in date_list %}
-<div class="dayOfWeek">
+<div class="dayOfWeek box_class">
     <div class="dayOfWeekHeader" >{{ day|date:"l, " }}{{ day }}<input type="hidden" class="dayHeader" name="day" value="{{ day|date:"Y-m-d" }}"></div>
 
         {% for stime in time_list %}
