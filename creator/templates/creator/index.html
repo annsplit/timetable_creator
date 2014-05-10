@@ -238,15 +238,22 @@
         $( "#messageList, .timegrid, .plenary, .simple, .sectional, .timedrop" ).sortable({
             connectWith: ".connectedSortable",
             placeholder: "ui-state-highlight",
-            update: function(){
+            start: function(event, ui) {
+                var drag_id = ui.item.attr('id');
+                ui.item.data('drag_id', drag_id);
+            },
+            update: function(event, ui){
+                var drag_id = ui.item.data('drag_id');
                 if ($(this).children().is('.message')){
                     var sid = $(this).closest(".sid_class").attr('id');
-                    var report_id = $(this).children().attr('id');
+                    var report_id = drag_id;
                     report_id = report_id.replace("r","");
                     int_report_id = +report_id;
+
                     for (var i=1; i<Object.keys(reports_array).length+1; i++)
                         if (i == int_report_id ){
                             reports_array[i] = sid;
+                            alert(reports_array[i])
                         }
                 }
                 else {
@@ -321,10 +328,12 @@
     <ul id="messageList" class="connectedSortable">
 
         {% for report in message_list %}
-            <li class="message" id="r{{ report.id }}">
-                {{ report.RName }}
-                <br><i>{{ report.Person }}</i>
-            </li>
+            {% if report.SID_id == None %}
+                <li class="message" id="r{{ report.id }}">
+                    {{ report.RName }}
+                    <br><i>{{ report.Person }}</i>
+                </li>
+            {% endif %}
 
 
 
@@ -396,6 +405,15 @@
                                     <br><i>{{ section.Person }}</i>
 
                                     <br><br>Перетащите доклады сюда
+                                    {% for report in message_list %}
+                                        {% if report.SID_id == section.id %}
+                                            <li class="message" id="r{{ report.id }}">
+                                                {{ report.RName }}
+                                                <br><i>{{ report.Person }}</i>
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+
                                     <input type="hidden" class="my" name="SID" value="{{ section.id }}">
                                 </ul>
                             </li>
@@ -409,6 +427,14 @@
                                     <br><i>{{ section.Person }}</i>
 
                                     <br><br>Перетащите доклады сюда
+                                    {% for report in message_list %}
+                                        {% if report.SID_id == section.id %}
+                                            <li class="message" id="r{{ report.id }}">
+                                                {{ report.RName }}
+                                                <br><i>{{ report.Person }}</i>
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
                                     <input type="hidden" class="my" name="SID" value="{{ section.id }}">
                                 </ul>
                             </li>
