@@ -184,10 +184,10 @@
     {% endfor %}
 
     {% for report in message_list %}
-        {% if  report.SID_id  == None %}
+        {% if  report.Section_id  == None %}
             reports_array[{{ report.id }}]  = 0;
         {% else %}
-            reports_array[{{ report.id }}] = {{ report.SID_id }}
+            reports_array[{{ report.id }}] = {{ report.Section_id }}
         {% endif %}
         reports_width[{{ report.id }}] = {{ report.x_pos }};
         reports_height[{{ report.id }}] = {{ report.y_pos }};
@@ -400,10 +400,10 @@
     <ul id="messageList" class="connectedSortable box_class">
 
         {% for report in message_list %}
-            {% if report.SID_id == None %}
+            {% if report.Section_id == None %}
                 <li class="message" id="r{{ report.id }}">
-                    {{ report.RName }}
-                    <br><i>{{ report.Person }}</i>
+                    {{ report.Report.RName }}
+                    <br><i>{{ report.Report.Reporter }}</i>
                 </li>
             {% endif %}
 
@@ -413,17 +413,17 @@
 
         {% for section in section_list %}
 
-            {% if section.SName == "Пленарные" and section.StartTime == None %}
+            {% if section.Type.TName == "Пленарные" and section.StartTime == None %}
                 <li class="resizablePlenary sid_class" id="{{ section.id }}">
                     <ul class="connectedSortable timegrid plenary">
                         {{ section.SName }}
                         <br><i>{{ section.Person }}</i>
                         <br><br>Перетащите доклады сюда
                         {% for report in message_list %}
-                            {% if report.SID_id == section.id %}
+                            {% if report.Section_id == section.id %}
                                 <li class="message" id="r{{ report.id }}">
-                                {{ report.RName }}
-                                <br><i>{{ report.Person }}</i>
+                                {{ report.Report.RName }}
+                                <br><i>{{ report.Report.Reporter }}</i>
                                 </li>
                             {% endif %}
                         {% endfor %}
@@ -434,17 +434,17 @@
 
 
 
-            {% elif section.SName == "Секционные" and section.StartTime == None%}
+            {% elif section.Type.TName == "Секционные" and section.StartTime == None%}
                  <li class="resizableSectional  sid_class" id="{{ section.id }}">
                      <ul class="connectedSortable timegrid sectional">
                          {{ section.SName }}
                          <br><i>{{ section.Person }}</i>
                          <br><br>Перетащите доклады сюда
                          {% for report in message_list %}
-                             {% if report.SID_id == section.id %}
+                             {% if report.Section_id == section.id %}
                                  <li class="message" id="r{{ report.id }}">
-                                     {{ report.RName }}
-                                     <br><i>{{ report.Person }}</i>
+                                     {{ report.Report.RName }}
+                                     <br><i>{{ report.Report.Reporter }}</i>
                                  </li>
                              {% endif %}
                          {% endfor %}
@@ -489,7 +489,7 @@
             <ul class=" connectedSortable timedrop">
                 {%  for section in section_list %}
                     {% if section.StartTime|time:"H:i" == stime|time:"H:i" and section.StartTime.date == day %}
-                        {% if section.SName == "Пленарные" %}
+                        {% if section.Type.TName == "Пленарные" %}
                             <li class="resizablePlenary sid_class" id="{{ section.id }}">
                                 <ul class="connectedSortable timegrid plenary">
 
@@ -498,10 +498,10 @@
 
                                     <br><br>Перетащите доклады сюда
                                     {% for report in message_list %}
-                                        {% if report.SID_id == section.id %}
+                                        {% if report.Section_id == section.id %}
                                             <li class="message" id="r{{ report.id }}">
-                                                {{ report.RName }}
-                                                <br><i>{{ report.Person }}</i>
+                                                {{ report.Report.RName }}
+                                                <br><i>{{ report.Report.Reporter }}</i>
                                             </li>
                                         {% endif %}
                                     {% endfor %}
@@ -511,7 +511,7 @@
                             </li>
 
 
-                        {% elif section.SName == "Секционные" %}
+                        {% elif section.Type.TName == "Секционные" %}
                             <li class="resizableSectional  sid_class" id="{{ section.id }}">
                                 <ul class="connectedSortable timegrid sectional">
 
@@ -520,10 +520,10 @@
 
                                     <br><br>Перетащите доклады сюда
                                     {% for report in message_list %}
-                                        {% if report.SID_id == section.id %}
+                                        {% if report.Section_id == section.id %}
                                             <li class="message" id="r{{ report.id }}">
-                                                {{ report.RName }}
-                                                <br><i>{{ report.Person }}</i>
+                                                {{ report.Report.RName }}
+                                                <br><i>{{ report.Report.Reporter }}</i>
                                             </li>
                                         {% endif %}
                                     {% endfor %}

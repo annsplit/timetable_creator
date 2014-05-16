@@ -1,20 +1,23 @@
 from django.contrib import admin
 
 # Register your models here.
-from creator.models import report, conference, section, time
+from creator.models import report, conference, section, section_type, event
 
 
 
 class report_admin(admin.ModelAdmin):
     fieldsets = [
-        ('Topic',               {'fields': ['RName']}),
-        ('Name of scientist',   {'fields': ['Person']}),
-        ('Person',              {'fields': ['Sponsor']}),
-        ('Section',              {'fields': ['SID']}),
-        ('x_pos',              {'fields': ['x_pos']}),
-        ('y_pos',              {'fields': ['y_pos']}),
+        ('Name',               {'fields': ['RName']}),
+        ('Annotation',   {'fields': ['Annotation']}),
+        ('Reporter',              {'fields': ['Reporter']}),
+        ('Topic',              {'fields': ['Topic']}),
+        ('Session',              {'fields': ['Session']}),
+        ('Organisation',              {'fields': ['Organisation']}),
+        ('Author',              {'fields': ['Author']}),
+        ('Sponsor',              {'fields': ['Sponsor']}),
+        ('IsFinal',              {'fields': ['IsFinal']}),
     ]
-    list_display = ('RName', 'Person', 'Sponsor')
+    list_display = ('RName', 'Reporter', 'Sponsor', 'Session')
 
 
 class conference_admin(admin.ModelAdmin):
@@ -25,27 +28,44 @@ class conference_admin(admin.ModelAdmin):
         ('daystart', {'fields': ['DayStart']}),
         ('dayend', {'fields': ['DayEnd']})
     ]
+    list_display = ('CName', 'StartDate', 'EndDate')
 
 
 class section_admin(admin.ModelAdmin):
     fieldsets = [
         ('Name', {'fields': ['SName']}),
         ('Person', {'fields': ['Person']}),
-
         ('StartDateTime', {'fields': ['StartTime']}),
         ('Conference', {'fields': ['Conference']}),
-        ('TimeCount', {'fields': ['TimeCount']}),
+        ('Place', {'fields': ['Place']}),
+        ('Type', {'fields': ['Type']}),
         ('x', {'fields': ['x_pos']}),
         ('y', {'fields': ['y_pos']}),
     ]
+    list_display = ('SName', 'Person', 'StartTime', 'Place', 'Conference')
 
 
-class time_admin(admin.ModelAdmin):
+class section_type_admin(admin.ModelAdmin):
     fieldsets = [
-        ('Count', {'fields': ['Count']})
+        ('Type', {'fields': ['TName']}),
+        ('color', {'fields': ['color']})
+
     ]
+    list_display = ('TName', 'color')
+
+
+class event_admin(admin.ModelAdmin):
+    fieldsets = [
+        ('Section', {'fields': ['Section']}),
+        ('order', {'fields': ['order']}),
+        ('x', {'fields': ['x_pos']}),
+        ('y', {'fields': ['y_pos']}),
+        ('Report', {'fields': ['Report']}),
+    ]
+    list_display = ('Report', 'Section', 'order')
 
 admin.site.register(report, report_admin)
 admin.site.register(conference, conference_admin)
 admin.site.register(section, section_admin)
-admin.site.register(time, time_admin)
+admin.site.register(section_type, section_type_admin)
+admin.site.register(event, event_admin)

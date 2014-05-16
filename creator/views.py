@@ -10,7 +10,7 @@ from django.http import Http404
 
 # Create your views here.
 from django.http import HttpResponse, QueryDict
-from creator.models import report, conference, section
+from creator.models import report, conference, section, event
 from django.views.decorators.csrf import csrf_exempt
 from datetime import time
 import urllib
@@ -22,7 +22,7 @@ class LoginForm(forms.Form):
 
 
 def index(request):
-    message_list = report.objects.all().order_by('-RName')
+    message_list = event.objects.all().order_by('-Report')
 
     conference_name = conference.objects.first()
 
@@ -108,14 +108,14 @@ def save_reports(request):
     if request.method == 'POST':
         positions = request.POST
         for p in positions:
-            rep = report.objects.get(id=p)
+            rep = event.objects.get(id=p)
             if (positions[p] > '0'):
                 newpos = positions[p]
             else:
                 newpos = None;
-            if (rep.SID_id != newpos):
-                rep.SID_id = newpos
-                rep.save(update_fields=['SID_id'])
+            if (rep.Section_id != newpos):
+                rep.Section_id = newpos
+                rep.save(update_fields=['Section_id'])
     return HttpResponse('Success')
 
 
@@ -125,7 +125,7 @@ def save_reports_width(request):
         width = request.POST
         for w in width:
             if (width[w] > 0):
-                rep = report.objects.get(id=w)
+                rep = event.objects.get(id=w)
                 newwidth = width[w]
                 rep.y_pos = newwidth
                 rep.save(update_fields=['x_pos'])
@@ -138,7 +138,7 @@ def save_reports_height(request):
         height = request.POST
         for h in height:
             if (height[h] > 0):
-                rep = report.objects.get(id=h)
+                rep = event.objects.get(id=h)
                 newheight = height[h]
                 rep.y_pos = newheight
                 rep.save(update_fields=['y_pos'])
