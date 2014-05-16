@@ -14,6 +14,18 @@ from creator.models import report, conference, section, event
 from django.views.decorators.csrf import csrf_exempt
 from datetime import time
 import urllib
+import urllib2
+from urllib2 import urlopen
+from urllib import urlencode
+import cookielib
+import re
+import sys
+import datetime
+import traceback
+import codecs
+
+from HTMLParser import HTMLParser
+pars = HTMLParser()
 
 
 class LoginForm(forms.Form):
@@ -152,3 +164,127 @@ def save_reports_height(request):
 
 #def vote(request, poll_id):
  #   return HttpResponse("You're voting on poll %s." % poll_id)
+
+
+def unescape_entities(s):
+    escaped = s
+    unescaped = pars.unescape(escaped)
+    while (unescaped != escaped):
+        escaped = unescaped
+        unescaped = pars.unescape(escaped)
+    return unescaped
+
+
+(username, password) = ("pavt2014", "hjcnjd")
+url = u'http://newserv.srcc.msu.ru/PMA/'
+database = u"agora"
+authorstable = u"conf_pavt2014_appl_members"
+reportstable = u"conf_pavt2014_thes_reports"
+expertstable = u"conf_pavt2014_experts"
+
+def init_cookie_jar():
+    global jar
+    jar = cookielib.MozillaCookieJar(u'cookies.txt')
+
+    try:
+        print u"trying to load cookies"
+        jar.load()
+        print u"cookies loaded"
+    except:
+        print u"cannot load cookies, overwriting the file with empty cookies"
+        jar.save()
+
+    urllib2.install_opener(urllib2.build_opener(urllib2.HTTPCookieProcessor(jar)))
+
+def need_to_login():
+    page = urlopen(url + u'index.php').read().decode(u'latin1')
+    return ur'<body class="loginform">' in page
+
+def postencode(**kwargs):
+    return urlencode(kwargs).encode(u'latin1')
+
+def login(username, password):
+    global jar
+    if need_to_login():
+        print u"need to log in"
+    else:
+        print u"already logged in"
+        jar.save()
+        return True
+
+    global token
+    page = urlopen(url, postencode(pma_username=username, pma_password=password)).read().decode(u'latin1')
+    m = re.search(ur'token=(\w+)', page, re.MULTILINE)
+    if m:
+        token = m.group(1)
+        print u'token = "%s"' % token
+    else:
+        print u'cannot parse token'
+        return False
+
+    if need_to_login():
+        print u"failed to log in"
+        return False
+    else:
+        print u"logged in"
+        jar.save()
+        return True
+
+def table_to_csv(table, filename, inenc=u'koi8-r', outenc=u'cp1251'):
+    print u"saving table '%s' (%s) to file '%s' (%s)" % (table, inenc, filename, outenc)
+    postdata = {
+        u'db': u'agora',
+        u'table': table,
+        u'token': token,
+        u'single_table': u'TRUE',
+        u'export_type': u'table',
+        u'what': u'csv',
+        u'csv_data': u'',
+        u'csv_separator': u'$',
+        u'csv_enclosed': u'}',
+        u'csv_escaped': u'\\',
+        u'csv_terminated': u'AUTO',
+        u'csv_null': u'',
+        u'csv_columns': u'something',
+        u'asfile': u'sendit',
+		u'filename_template': u'__TABLE__',
+		u'compression': u'none',
+	}
+    print u"query: %s" % repr(postdata)
+    encdata = postencode(**postdata)
+    print u"encoded query: %s" % encdata
+    csv = urlopen(url + u'export.php', encdata).read().decode(u'koi8-r')
+    #f = open(filename, u'w', encoding=outenc, errors=u'replace')
+    f = codecs.open(filename, u'w', encoding=outenc, errors=u'replace')
+    print u'replacing entities'
+    csv = unescape_entities(csv)
+    f.write(csv)
+    print u"table '%s' saved to file '%s'" % (table, filename)
+
+def now():
+    return datetime.datetime.now().strftime(u'%Y%m%d%H%M%S')
+
+def data_get(request):
+    try:
+        init_cookie_jar()
+        if not login(username, password):
+            sys.exit(1)
+
+        files = {}
+        for table in [authorstable, reportstable, expertstable]:
+            filename = '%s-%s.csv' % (table, now())
+            table_to_csv(table, filename)
+            files[table] = filename
+
+        filenames = list(files.values())
+
+
+
+        print u'done.'
+    except Exception, e:
+        print u'FAILURE: %s' % e
+        traceback.print_exc()
+        print u'Dying!'
+        sys.exit(1)
+
+    return HttpResponse('okay')
