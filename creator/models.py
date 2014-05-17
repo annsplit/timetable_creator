@@ -47,6 +47,7 @@ class section(models.Model):
 
 
 class report(models.Model):
+    rid = models.IntegerField()
     RName = models.CharField(max_length=200)
     Annotation = models.CharField(max_length=200)
     Reporter = models.CharField(max_length=200)
@@ -66,6 +67,6 @@ class event(models.Model):
     x_pos = models.FloatField(default=0)
     y_pos = models.FloatField(default=0)
     Section = models.ForeignKey(section, null=True, blank=True)
-    Report = models.OneToOneField(report, null=True, blank=True)
+    Report = models.OneToOneField(report, null=True, blank=True,on_delete=models.SET_NULL,)
 
 

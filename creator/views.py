@@ -20,7 +20,7 @@ from urllib import urlencode
 import cookielib
 import re
 import sys
-import datetime
+import csv
 import traceback
 import codecs
 
@@ -180,7 +180,7 @@ url = u'http://newserv.srcc.msu.ru/PMA/'
 database = u"agora"
 authorstable = u"conf_pavt2014_appl_members"
 reportstable = u"conf_pavt2014_thes_reports"
-expertstable = u"conf_pavt2014_experts"
+#expertstable = u"conf_pavt2014_experts"
 
 def init_cookie_jar():
     global jar
@@ -240,10 +240,10 @@ def table_to_csv(table, filename, inenc=u'koi8-r', outenc=u'cp1251'):
         u'export_type': u'table',
         u'what': u'csv',
         u'csv_data': u'',
-        u'csv_separator': u'$',
-        u'csv_enclosed': u'}',
+        u'csv_separator': u'|',
+        u'csv_enclosed': u'',
         u'csv_escaped': u'\\',
-        u'csv_terminated': u'AUTO',
+        u'csv_terminated': u'$$\n',
         u'csv_null': u'',
         u'csv_columns': u'something',
         u'asfile': u'sendit',
@@ -254,15 +254,15 @@ def table_to_csv(table, filename, inenc=u'koi8-r', outenc=u'cp1251'):
     encdata = postencode(**postdata)
     print u"encoded query: %s" % encdata
     csv = urlopen(url + u'export.php', encdata).read().decode(u'koi8-r')
-    #f = open(filename, u'w', encoding=outenc, errors=u'replace')
     f = codecs.open(filename, u'w', encoding=outenc, errors=u'replace')
     print u'replacing entities'
     csv = unescape_entities(csv)
     f.write(csv)
+    f.close()
     print u"table '%s' saved to file '%s'" % (table, filename)
 
 def now():
-    return datetime.datetime.now().strftime(u'%Y%m%d%H%M%S')
+    return datetime.now().strftime(u'%Y%m%d%H%M%S')
 
 def data_get(request):
     try:
@@ -271,12 +271,95 @@ def data_get(request):
             sys.exit(1)
 
         files = {}
-        for table in [authorstable, reportstable, expertstable]:
+        for table in [authorstable, reportstable]:
             filename = '%s-%s.csv' % (table, now())
             table_to_csv(table, filename)
             files[table] = filename
 
+        #csv.register_dialect('unixpwd', delimiter=':', quoting=csv.QUOTE_NONE)
+        #print(files[1])
+        #with open(files[1]) as f:
+         #   reader = csv.reader(f, delimiter='|', lineterminator='$\n', enclosechar='}')
+        #for row in reader:
+         #   print row
         filenames = list(files.values())
+
+        def unicode_csv_reader(unicode_csv_data, dialect=csv.excel, **kwargs):
+            # csv.py doesn't do Unicode; encode temporarily as UTF-8:
+            csv_reader = csv.reader(utf_8_encoder(unicode_csv_data),   **kwargs)
+            for row in csv_reader:
+                # decode UTF-8 back to Unicode, cell by cell:
+                yield [unicode(cell, 'utf-8') for cell in row]
+
+        def utf_8_encoder(unicode_csv_data):
+            for line in unicode_csv_data:
+                yield line.encode('utf-8')
+
+
+        #f = codecs.open(filenames[1], u'rb', encoding=u'koi8-r', errors=u'replace')
+        #with codecs.open(filenames[1], u'w', encoding=u'cp1251', errors=u'replace') as f:
+        def records(path):
+            with codecs.open(path, 'rbU', encoding='cp1251', errors=u'replace') as f:
+                contents = f.read().replace('\n', '').replace('\r', '')
+                return (record for record in contents.split('$$'))
+
+        #clean = codecs.open(filenames[1], 'rbU', encoding=u'koi8-r', errors=u'replace').read().replace('\n', '')
+        reader = unicode_csv_reader(records(filenames[1]),  delimiter='|', lineterminator='$$')
+        reader_r = unicode_csv_reader(records(filenames[0]),  delimiter='|', lineterminator='$$')
+
+        new_report = []
+        header = []
+        rownum = 0
+        a_set =['id', 'title', 'xfield001', 'xfield008', 'xfield016', 'xfield005', 'authors']
+
+        for row in reader_r:
+            if rownum == 0:
+                header = row
+                print(header)
+                rownum+=1
+            else:
+                colnum = 0
+                rid = u""
+                title = u""
+                ann = u""
+                reporter = u""
+                topic = u""
+                session = u""
+                author = u""
+                final = u""
+                for col in row:
+                    if header[colnum] == 'id':
+                        rid = col
+                        print(col)
+                    if header[colnum] == 'title':
+                        title = col
+                    elif header[colnum] == 'xfield001':
+                        ann = col
+                    elif header[colnum] == 'xfield008':
+                        reporter = col
+                    elif header[colnum] == 'xfield016':
+                        topic = col
+                        rep = report(rid=int(rid), RName=title, Annotation=ann, Reporter=reporter, Topic=topic, Session=session, Organisation='unknown', Author=author, Sponsor='unknown', IsFinal=final )
+                        rep.save()
+                    elif header[colnum] == 'xfield005':
+                        session = col
+                    elif header[colnum] == 'authors':
+                        author = col
+                    elif header[colnum] == 'confirm':
+                        final = col
+
+
+                    colnum +=1
+                #print rid,title,ann,reporter,topic,session,author,final
+
+                #print(col)
+                #rep = report(rid=int(rid), RName=title, Annotation=ann, Reporter=reporter, Topic=topic, Session=session, Organisation='unknown', Author=author, Sponsor='unknown', IsFinal=final )
+                #rep.save()
+                    #new_report.append(col.encode('utf-8'))
+                    #print new_report[0][1]
+                    #rep = report(id=)
+
+        #print(dictionary)
 
 
 
