@@ -339,8 +339,9 @@ def data_get(request):
                         reporter = col
                     elif header[colnum] == 'xfield016':
                         topic = col
-                        rep = report(rid=int(rid), RName=title, Annotation=ann, Reporter=reporter, Topic=topic, Session=session, Organisation='unknown', Author=author, Sponsor='unknown', IsFinal=final )
-                        rep.save()
+                        if report.objects.filter(rid=int(rid)).count()==0:
+                            rep = report(rid=int(rid), RName=title, Annotation=ann, Reporter=reporter, Topic=topic, Session=session, Organisation='unknown', Author=author, Sponsor='unknown', IsFinal=final )
+                            rep.save()
                     elif header[colnum] == 'xfield005':
                         session = col
                     elif header[colnum] == 'authors':
