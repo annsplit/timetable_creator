@@ -11,7 +11,8 @@ from django.template import RequestContext, loader
 
 # Create your views here.
 from django.http import HttpResponse, QueryDict
-from creator.models import report, conference, section, event, section_type
+from creator.models import report, conference, section, event, section_type, reports_time
+from creator.forms import ReportForm
 from django.views.decorators.csrf import csrf_exempt
 from datetime import time
 import urllib
@@ -72,14 +73,15 @@ def detail(request, conference_id):
 
 
     form = LoginForm()
-
+    reports_time_list = reports_time.objects.last()
     context = {'message_list': message_list,
                'conference_name': conference_name,
                'date_list': date_list,
                'form': form,
                'section_list': section_list,
                'time_list': time_list,
-               'types_list': types_list
+               'types_list': types_list,
+               'reports_time_list': reports_time_list
 
     }
     #return render(request, 'creator/detail.html', context)
@@ -151,7 +153,7 @@ def save_reports_width(request):
             if (width[w] > 0):
                 rep = event.objects.get(id=w)
                 newwidth = width[w]
-                rep.y_pos = newwidth
+                rep.x_pos = newwidth
                 rep.save(update_fields=['x_pos'])
     return HttpResponse('Success')
 
@@ -168,6 +170,23 @@ def save_reports_height(request):
                 rep.save(update_fields=['y_pos'])
     return HttpResponse('Success')
 
+def edit_report(request):
+    rep = report.objects.get(id=1)
+    rform = ReportForm(data=request.GET)
+    if request.method == "POST":
+        rform = ReportForm(data = request.POST)
+        if rform.is_valid():
+            rep = rform.save()
+    template = loader.get_template('creator/edit.html')
+    context = RequestContext(request, {
+        'rform': rform,
+    })
+    return HttpResponse(template.render(context))
+
+
+def change_timecount(request):
+    time_list = section_type.objects.all()
+    return render(request, 'creator/change_timecounts.html', {'time_list': time_list} )
 
 #def detail(request, conference_id):
  #   poll = get_object_or_404(conference, pk=conference_id)

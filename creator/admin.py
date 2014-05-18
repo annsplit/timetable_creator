@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from creator.models import report, conference, section, section_type, event
+from creator.models import report, conference, section, section_type, event, reports_time
 
 
 
@@ -48,7 +48,8 @@ class section_admin(admin.ModelAdmin):
 class section_type_admin(admin.ModelAdmin):
     fieldsets = [
         ('Type', {'fields': ['TName']}),
-        ('color', {'fields': ['color']})
+        ('color', {'fields': ['color']}),
+        ('time_default', {'fields': ['time_default']})
 
     ]
     list_display = ('TName', 'color')
@@ -64,8 +65,18 @@ class event_admin(admin.ModelAdmin):
     ]
     list_display = ('Report', 'Section', 'order')
 
+
+class reports_time_admin(admin.ModelAdmin):
+    fieldsets = [
+        ('plenary', {'fields': ['plenary']}),
+        ('sectional', {'fields': ['sectional']})
+    ]
+    list_display = ('plenary', 'sectional')
+
+
 admin.site.register(report, report_admin)
 admin.site.register(conference, conference_admin)
 admin.site.register(section, section_admin)
 admin.site.register(section_type, section_type_admin)
 admin.site.register(event, event_admin)
+admin.site.register(reports_time, reports_time_admin)

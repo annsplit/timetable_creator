@@ -1,4 +1,5 @@
 from django.db import models
+from django import forms
 
 # Create your models here.
 
@@ -28,8 +29,16 @@ class section_type(models.Model):
     )
     TName = models.CharField(max_length=200)
     color = models.CharField(max_length=40, choices=COLOR_CHOICES)
+    time_default = models.IntegerField()
     def __unicode__(self):  # Python 3: def __str__(self):
         return self.TName
+
+
+class reports_time(models.Model):
+    plenary = models.IntegerField()
+    sectional = models.IntegerField()
+    def __unicode__(self):  # Python 3: def __str__(self):
+        return self.plenary, self.sectional
 
 
 class section(models.Model):
@@ -70,3 +79,7 @@ class event(models.Model):
     Report = models.OneToOneField(report, null=True, blank=True,on_delete=models.SET_NULL,)
 
 
+class ReportForm(forms.ModelForm):
+    class Meta:
+        model = report
+        fields = ["RName", "Reporter", "Topic"]

@@ -25,7 +25,10 @@
     var reports_array = {};
     var reports_width = {};
     var reports_height = {};
-
+    rep_p = {{ reports_time_list.plenary }};
+    rep_p *=2;
+    rep_s = {{ reports_time_list.sectional }};
+    rep_s *=2;
     {% for section in section_list %}
         {%  if section.StartTime == None %}
             sections_array[{{section.id}}] = "";
@@ -144,12 +147,24 @@
                 var dest = event.target.id;
                 if (drag_id.indexOf("r") > -1){
                     var sid = $(this).closest(".sid_class").attr('id');
+                    var c = $(this).closest(".sid_class").attr('class');
+                    var report_id = drag_id;
+                    report_id = report_id.replace("r","");
+                    int_report_id = +report_id;
+                    if (c.indexOf("resizablePlenary") > -1){
+                        new_height = rep_p;
+                        $('#'+drag_id).css("height", new_height);
+                        reports_height[int_report_id] = new_height;
+                    }
+                    if (c.indexOf("resizableSectional") > -1){
+                        new_height = rep_s;
+                        $('#'+drag_id).css("height", new_height);
+                        reports_height[int_report_id] = new_height;
+                    }
                     if (sid[0] == "m"){
                         sid = 0;
                     }
-                        var report_id = drag_id;
-                        report_id = report_id.replace("r","");
-                        int_report_id = +report_id;
+
                     for (var i=1; i<Object.keys(reports_array).length+1; i++)
                         if (i == int_report_id ){
                             reports_array[i] = sid;
@@ -227,6 +242,12 @@
         }
         for (var i=1; i<Object.keys(reports_array).length+1; i++){
             v = i.toString();
+            //var c = $('#r'+v).closest(".sid_class").attr('class');
+            /*
+                if (c.indexOf("resizablePlenary") > -1)
+                    $('#r'+v).css("height", 200);
+                if (c.indexOf("resizableSectional") > -1)
+                    $('#r'+v).css("height", 500);*/
             if (reports_width[i] > 0)
                 $('#r'+v).css("width", reports_width[i]);
             if (reports_height[i] > 0)
@@ -281,7 +302,7 @@
                     <ul class="connectedSortable timegrid plenary">
                         {{ section.SName }}
                         <br><i>{{ section.Person }}</i>
-                        <br><br>Перетащите доклады сюда
+                        <br>
                         {% for report in message_list %}
                             {% if report.Section_id == section.id %}
                                 <li class="message" id="r{{ report.id }}">
@@ -302,7 +323,7 @@
                      <ul class="connectedSortable timegrid sectional">
                          {{ section.SName }}
                          <br><i>{{ section.Person }}</i>
-                         <br><br>Перетащите доклады сюда
+                         <br>
                          {% for report in message_list %}
                              {% if report.Section_id == section.id %}
                                  <li class="message" id="r{{ report.id }}">
@@ -359,7 +380,7 @@
                                     {{ section.SName }}
                                     <br><i>{{ section.Person }}</i>
 
-                                    <br><br>Перетащите доклады сюда
+                                    <br>
                                     {% for report in message_list %}
                                         {% if report.Section_id == section.id %}
                                             <li class="message" id="r{{ report.id }}">
@@ -381,7 +402,7 @@
                                     {{ section.SName }}
                                     <br><i>{{ section.Person }}</i>
 
-                                    <br><br>Перетащите доклады сюда
+                                    <br>
                                     {% for report in message_list %}
                                         {% if report.Section_id == section.id %}
                                             <li class="message" id="r{{ report.id }}">
