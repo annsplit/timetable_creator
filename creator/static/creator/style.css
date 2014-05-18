@@ -68,7 +68,7 @@
         #messageList li, .timegrid li {
 
             padding: 5px;
-            margin: -0.3px;
+
 
             min-height: 40px;
             height: auto;
@@ -90,7 +90,7 @@
             width: 500px;
             padding: 0.3px;
             float: left;
-            
+
 
         }
 

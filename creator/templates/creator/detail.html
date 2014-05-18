@@ -25,6 +25,11 @@
     var reports_array = {};
     var reports_width = {};
     var reports_height = {};
+    var sec_time_def = {};
+    var section_types = {};
+    {% for t in types_list %}
+        sec_time_def[{{ t.id }}] = 2 * {{ t.time_default }};
+    {% endfor %}
     rep_p = {{ reports_time_list.plenary }};
     rep_p *=2;
     rep_s = {{ reports_time_list.sectional }};
@@ -35,7 +40,7 @@
         {% else %}
             sections_array[{{section.id}}] = "{{ section.StartTime|date:"Y-m-d H:m:s" }}";
         {% endif %}
-
+        section_types[{{ section.id }}] = {{ section.Type_id }};
         sections_width[{{ section.id }}] = {{ section.x_pos }};
         sections_height[{{ section.id }}] = {{ section.y_pos }};
     {% endfor %}
@@ -236,18 +241,16 @@
             $('#'+v).css("background-color", colors_array[i]);
             if (sections_width[i] > 0)
                 $('#'+v).css("width", sections_width[i]);
+            alert(sections_height[i]);
+            //alert(sec_time_def[section_types[i]]);
             if (sections_height[i] > 0)
                 $('#'+v).css("height", sections_height[i]);
+            else
+                $('#'+v).css("height", sec_time_def[section_types[i]]);
 
         }
         for (var i=1; i<Object.keys(reports_array).length+1; i++){
             v = i.toString();
-            //var c = $('#r'+v).closest(".sid_class").attr('class');
-            /*
-                if (c.indexOf("resizablePlenary") > -1)
-                    $('#r'+v).css("height", 200);
-                if (c.indexOf("resizableSectional") > -1)
-                    $('#r'+v).css("height", 500);*/
             if (reports_width[i] > 0)
                 $('#r'+v).css("width", reports_width[i]);
             if (reports_height[i] > 0)
