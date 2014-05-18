@@ -41,6 +41,7 @@
             position: fixed;
             right: 20px;
             padding: 5px;
+
         }
 
 
@@ -121,7 +122,7 @@
         }
 
         .timetext{
-            font-size: 8px;
+            font-size: 12px;
 
             position: absolute;
         }
@@ -485,7 +486,7 @@
         {% for stime in time_list %}
 
         <div class="time">
-            <div class="timetext">{{ stime|time:"H:i" }}</div>
+            {% if stime|time:"i" in "051525354555" %}<div class="timetext" style="display: none">{% else %}<div class="timetext">{% endif %}{{ stime|time:"H:i" }}</div>
             <ul class=" connectedSortable timedrop">
                 {%  for section in section_list %}
                     {% if section.StartTime|time:"H:i" == stime|time:"H:i" and section.StartTime.date == day %}
