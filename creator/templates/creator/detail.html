@@ -11,154 +11,7 @@
 
     <style>
 
-        .my{
-        }
 
-        #submit{
-            margin: 20px;
-        }
-
-        .dayHeader{
-
-        }
-
-        #pageHeader
-        {
-            font-family: arial;
-            font-size: 34;
-            margin: 20px;
-        }
-
-        #messagesBox
-        {
-            width: 550px;
-            margin: 20px;
-            font-family: Verdana;
-            font-size: 13;
-            background-color: aliceblue;
-            float: right;
-            height: 80%;
-            position: fixed;
-            right: 20px;
-            padding: 5px;
-
-        }
-
-
-
-        .dayOfWeek
-        {
-            width: 1200px;
-            margin: 20px;
-            font-family: Verdana;
-            font-size: 13;
-            background-color: lightgoldenrodyellow;
-            float: left;
-            padding: 10px;
-        }
-
-
-        .dayOfWeekHeader
-        {
-            width: 1350px;
-            font-size: 22;
-            font-family: arial;
-            border: 0px;
-            height: 60px;
-
-        }
-
-        #messageList, .timegrid{
-            list-style-type: none;
-            padding: 5px;
-            float: left;
-            margin: 5px;
-            width: 550px;
-            min-height: 100px;
-        }
-
-        #messageList li, .timegrid li {
-            margin: 10px;
-            padding: 5px;
-
-            min-height: 40px;
-            height: auto;
-        }
-
-
-        .message {
-
-            width: 300px;
-            background: white;
-            float: left;
-            position: relative;
-
-        }
-        .sectional {
-
-            width: 500px;
-
-            float: left;
-            margin-top: -0.3px;
-
-        }
-
-        .plenary {
-
-            width: 500px;
-            float: left;
-
-        }
-
-        .simple{
-            width: 450px;
-            float: left;
-        }
-
-        .time{
-            list-style: none;
-
-            margin-right: 20px;
-        }
-
-        .timetext{
-            font-size: 12px;
-
-            position: absolute;
-        }
-
-        .timedrop{
-            border: 1px solid white;
-            list-style: none;
-            margin-top: -5px;
-        }
-
-        .resizablePlenary{
-            background-color: mediumpurple;
-            width: 500px;
-            float: left;
-            position: relative;
-            padding: 5px;
-            border: 1px solid white;
-        }
-
-        .resizableSectional{
-            background-color: greenyellow;
-            width: 500px;
-            position: relative;
-            float: left;
-            margin-top: -0.3px;
-            border: 1px solid white;
-        }
-
-        .resizableSimple{
-            background-color: ghostwhite;
-            width: 500px;
-            position: relative;
-            float: left;
-            margin-top: -0.3px;
-            border: 1px solid white;
-        }
   </style>
 
 
@@ -199,7 +52,7 @@
             type: 'POST',
             traditional: true,
             data: sections_array,
-            url: '/timetable/save/',
+            url: '/timetables/save/',
             success: function() {
                 alert("Временная сетка (положения) успешно сохранена");
             },
@@ -211,7 +64,7 @@
             type: 'POST',
             traditional: true,
             data: sections_width,
-            url: '/timetable/save_width/',
+            url: '/timetables/save_width/',
             success: function() {
                 alert("Временная сетка (ширина) успешно сохранена");
             },
@@ -223,7 +76,7 @@
             type: 'POST',
             traditional: true,
             data: sections_height,
-            url: '/timetable/save_height/',
+            url: '/timetables/save_height/',
             success: function() {
                 alert("Временная сетка (высота) успешно сохранена");
             },
@@ -236,7 +89,7 @@
             type: 'POST',
             traditional: true,
             data: reports_array,
-            url: '/timetable/save_reports/',
+            url: '/timetables/save_reports/',
             success: function() {
                 alert("Временная сетка (доклады) успешно сохранена");
             },
@@ -248,7 +101,7 @@
             type: 'POST',
             traditional: true,
             data: reports_width,
-            url: '/timetable/save_reports_width/',
+            url: '/timetables/save_reports_width/',
             success: function() {
                 alert("Временная сетка (доклады ширина) успешно сохранена");
             },
@@ -260,7 +113,7 @@
             type: 'POST',
             traditional: true,
             data: reports_height,
-            url: '/timetable/save_reports_height/',
+            url: '/timetables/save_reports_height/',
             success: function() {
                 alert("Временная сетка (доклады высота) успешно сохранена");
             },
@@ -389,6 +242,9 @@
 </head>
 
 <body >
+{% load staticfiles %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'creator/style.css' %}" />
 
 <p id="pageHeader">Раписание научной конференции <b>"{{ conference_name }}"</b></p>
 

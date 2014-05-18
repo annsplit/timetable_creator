@@ -5,6 +5,7 @@ from django import forms
 # Create your views here.
 from django.shortcuts import render, get_object_or_404
 from django.http import Http404
+from django.template import RequestContext, loader
 
 
 
@@ -34,9 +35,18 @@ class LoginForm(forms.Form):
 
 
 def index(request):
+    conference_list = conference.objects.order_by('-StartDate')
+    template = loader.get_template('creator/base.html')
+    context = RequestContext(request, {
+        'conference_list': conference_list,
+    })
+    return HttpResponse(template.render(context))
+
+
+def detail(request, conference_id):
     message_list = event.objects.all().order_by('-Report')
 
-    conference_name = conference.objects.first()
+    conference_name = get_object_or_404(conference, pk=conference_id)
 
     date_list = []
     diff = conference_name.EndDate - conference_name.StartDate
@@ -71,7 +81,8 @@ def index(request):
                'time_list': time_list
 
     }
-    return render(request, 'creator/index.html', context)
+    #return render(request, 'creator/detail.html', context)
+    return render(request, 'creator/detail.html', context)
 
 
 @csrf_exempt
@@ -155,8 +166,10 @@ def save_reports_height(request):
                 rep.y_pos = newheight
                 rep.save(update_fields=['y_pos'])
     return HttpResponse('Success')
-#def detail(request, poll_id):
- #   poll = get_object_or_404(Poll, pk=poll_id)
+
+
+#def detail(request, conference_id):
+ #   poll = get_object_or_404(conference, pk=conference_id)
   #  return render(request, 'polls/detail.html', {'poll': poll})
 
 #def results(request, poll_id):

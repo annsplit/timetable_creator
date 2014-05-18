@@ -1,0 +1,15 @@
+{% load staticfiles %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'creator/style.css' %}" />
+<p id="pageHeader">Список конференций:</p>
+{% if conference_list %}
+    <ul>
+    {% for conf in conference_list %}
+        <li><a href="/timetables/{{ conf.id }}/">
+            {{ conf.CName }}
+            {{ conf.StartDate}}-{{ conf.EndDate }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No conferences are available.</p>
+{% endif %}
