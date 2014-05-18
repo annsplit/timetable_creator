@@ -47,6 +47,11 @@
         reports_height[{{ report.id }}] = {{ report.y_pos }};
     {% endfor %}
 
+    var colors_array = {};
+    {% for section in section_list %}
+        colors_array[{{ section.id }}] = "{{ section.Type.color }}";
+    {% endfor %}
+
     function saveTimetable(){
         $.ajax({
             type: 'POST',
@@ -213,6 +218,7 @@
     document.ready($(function(){
         for (var i=1; i<Object.keys(sections_array).length+1; i++){
             v = i.toString();
+            $('#'+v).css("background-color", colors_array[i]);
             if (sections_width[i] > 0)
                 $('#'+v).css("width", sections_width[i]);
             if (sections_height[i] > 0)

@@ -11,7 +11,7 @@ from django.template import RequestContext, loader
 
 # Create your views here.
 from django.http import HttpResponse, QueryDict
-from creator.models import report, conference, section, event
+from creator.models import report, conference, section, event, section_type
 from django.views.decorators.csrf import csrf_exempt
 from datetime import time
 import urllib
@@ -45,7 +45,7 @@ def index(request):
 
 def detail(request, conference_id):
     message_list = event.objects.all().order_by('-Report')
-
+    types_list = section_type.objects.all()
     conference_name = get_object_or_404(conference, pk=conference_id)
 
     date_list = []
@@ -78,7 +78,8 @@ def detail(request, conference_id):
                'date_list': date_list,
                'form': form,
                'section_list': section_list,
-               'time_list': time_list
+               'time_list': time_list,
+               'types_list': types_list
 
     }
     #return render(request, 'creator/detail.html', context)
