@@ -93,6 +93,8 @@ def save(request):
     if request.method == 'POST':
         times = request.POST
         for t in times:
+            print(t)
+            print(times[t])
             my = section.objects.get(id=t)
             param = "%Y-%m-%d %H:%M:%S"
             if (times[t] == ""):

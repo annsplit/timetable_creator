@@ -61,6 +61,7 @@
     {% endfor %}
 
     function saveTimetable(){
+
         $.ajax({
             type: 'POST',
             traditional: true,
@@ -135,7 +136,6 @@
             }
         });
 
-
     }
 
     $(function() {
@@ -183,14 +183,17 @@
 
                     else{
                         var time=$(this).closest("div.time").find(".timetext").text();
-                        var date_source=$(this).closest("div.dayOfWeek").find(".dayHeader").val();
+
+                        var date_source=$('#'+drag_id).closest("div.time").closest("div.dayOfWeek").find(".dayHeader").val();
+
+
                     }
-                    var section_id=$(this).find("input[type=hidden]").val();
 
                     for (var i=1; i<Object.keys(sections_array).length+1; i++)
-                        if (i == section_id ){
+                        if (i == drag_id ){
                             if (time!= "")
                                 sections_array[i] = date_source + " " + time + ":00" ;
+
                             else
                                 sections_array[i] = "";
                         }
@@ -238,11 +241,10 @@
     document.ready($(function(){
         for (var i=1; i<Object.keys(sections_array).length+1; i++){
             v = i.toString();
+
             $('#'+v).css("background-color", colors_array[i]);
             if (sections_width[i] > 0)
                 $('#'+v).css("width", sections_width[i]);
-            alert(sections_height[i]);
-            //alert(sec_time_def[section_types[i]]);
             if (sections_height[i] > 0)
                 $('#'+v).css("height", sections_height[i]);
             else
