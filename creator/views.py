@@ -93,8 +93,6 @@ def save(request):
     if request.method == 'POST':
         times = request.POST
         for t in times:
-            print(t)
-            print(times[t])
             my = section.objects.get(id=t)
             param = "%Y-%m-%d %H:%M:%S"
             if (times[t] == ""):
@@ -376,10 +374,9 @@ def data_get(request):
                         topic = col
                         if report.objects.filter(rid=int(rid)).count()==0:
                             rep = report(rid=int(rid), RName=title, Annotation=ann, Reporter=reporter, Topic=topic, Session=session, Organisation='unknown', Author=author, Sponsor='unknown', IsFinal=final )
-                            #ev = event()
-                            #ev.Report = rep
                             rep.save()
-                            #ev.save()
+                            ev = event(Report=rep)
+                            ev.save()
                     elif header[colnum] == 'xfield005':
                         session = col
                     elif header[colnum] == 'authors':
