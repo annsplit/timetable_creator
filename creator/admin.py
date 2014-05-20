@@ -26,7 +26,8 @@ class conference_admin(admin.ModelAdmin):
         ('Start date', {'fields': ['StartDate']}),
         ('End date', {'fields': ['EndDate']}),
         ('daystart', {'fields': ['DayStart']}),
-        ('dayend', {'fields': ['DayEnd']})
+        ('dayend', {'fields': ['DayEnd']}),
+        ('RepTime', {'fields': ['RepTime']})
     ]
     list_display = ('CName', 'StartDate', 'EndDate')
 
@@ -57,13 +58,14 @@ class section_type_admin(admin.ModelAdmin):
 
 class event_admin(admin.ModelAdmin):
     fieldsets = [
+        ('Conference', {'fields': ['Conference']}),
         ('Section', {'fields': ['Section']}),
         ('order', {'fields': ['order']}),
         ('x', {'fields': ['x_pos']}),
         ('y', {'fields': ['y_pos']}),
-        ('Report', {'fields': ['Report']}),
+        ('Report', {'fields': ['Report']})
     ]
-    list_display = ('Report', 'Section', 'order')
+    list_display = ('Report', 'Conference', 'Section', 'order')
 
 
 class reports_time_admin(admin.ModelAdmin):
@@ -73,10 +75,9 @@ class reports_time_admin(admin.ModelAdmin):
     ]
     list_display = ('plenary', 'sectional')
 
-
+admin.site.register(reports_time, reports_time_admin)
 admin.site.register(report, report_admin)
 admin.site.register(conference, conference_admin)
 admin.site.register(section, section_admin)
 admin.site.register(section_type, section_type_admin)
 admin.site.register(event, event_admin)
-admin.site.register(reports_time, reports_time_admin)

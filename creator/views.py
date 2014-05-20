@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+
 from django.shortcuts import render
 from datetime import timedelta, datetime, time, date
 from django import forms
@@ -44,7 +44,7 @@ def index(request):
     return HttpResponse(template.render(context))
 
 @csrf_exempt
-def edit_report(request):
+def edit_report(request, conference_id):
     if request.method=='POST':
         rep = request.POST.items()
         rid=0
@@ -66,9 +66,6 @@ def edit_report(request):
         new_rep.Reporter = reporter
         new_rep.save()
 
-            #if "id" in r:
-             #   rid=id
-
     qs = report.objects.order_by('-RName')
     formset = ReportFormset(queryset=qs)
     if formset.is_valid():
@@ -83,7 +80,7 @@ def edit_report(request):
 
 
 def detail(request, conference_id):
-    message_list = event.objects.all().order_by('-Report')
+    message_list = event.objects.filter(Conference=conference_id).order_by('-Report')
     types_list = section_type.objects.all()
     conference_name = get_object_or_404(conference, pk=conference_id)
 
@@ -93,7 +90,7 @@ def detail(request, conference_id):
     for i in range(1, diff.days+1):
         date_list.append(conference_name.StartDate + timedelta(days=i))
 
-    section_list = section.objects.all().order_by('StartTime')
+    section_list = section.objects.filter(Conference=conference_id).order_by('StartTime')
 
     time_list = []
     start = conference_name.DayStart.strftime('%H:%M')
@@ -115,7 +112,7 @@ def detail(request, conference_id):
     r = report.objects.get(id=1)
     form = ReportForm(instance=r)
     formset = ReportFormset(initial=report)
-    reports_time_list = reports_time.objects.last()
+    reports_time_list = reports_time.objects.get(conference=conference_id)
     context = {'message_list': message_list,
                'conference_name': conference_name,
                'date_list': date_list,
@@ -151,11 +148,12 @@ def save_width(request):
     if request.method == 'POST':
         width = request.POST
         for w in width:
-            if (width[w] > 0):
+            if (width[w] > '0'):
                 sect = section.objects.get(id=w)
                 newwidth = width[w]
                 sect.x_pos = newwidth
                 sect.save(update_fields=['x_pos'])
+
     return HttpResponse('Success')
 
 
@@ -164,7 +162,7 @@ def save_height(request):
     if request.method == 'POST':
         height = request.POST
         for h in height:
-            if (height[h] > 0):
+            if (height[h] > '0'):
                 sect = section.objects.get(id=h)
                 newheight = height[h]
                 sect.y_pos = newheight
@@ -177,11 +175,11 @@ def save_reports(request):
     if request.method == 'POST':
         positions = request.POST
         for p in positions:
-            rep = event.objects.get(id=p)
             if (positions[p] > '0'):
                 newpos = positions[p]
             else:
-                newpos = None;
+                newpos = None
+            rep = event.objects.get(id=p)
             if (rep.Section_id != newpos):
                 rep.Section_id = newpos
                 rep.save(update_fields=['Section_id'])
@@ -193,7 +191,7 @@ def save_reports_width(request):
     if request.method == 'POST':
         width = request.POST
         for w in width:
-            if (width[w] > 0):
+            if (width[w] > '0'):
                 rep = event.objects.get(id=w)
                 newwidth = width[w]
                 rep.x_pos = newwidth
@@ -206,7 +204,7 @@ def save_reports_height(request):
     if request.method == 'POST':
         height = request.POST
         for h in height:
-            if (height[h] > 0):
+            if (height[h] > '0'):
                 rep = event.objects.get(id=h)
                 newheight = height[h]
                 rep.y_pos = newheight
@@ -387,7 +385,7 @@ def data_get(request):
         header = []
         rownum = 0
         a_set =['id', 'title', 'xfield001', 'xfield008', 'xfield016', 'xfield005', 'authors']
-
+        conference_name = get_object_or_404(conference, pk=1)
         for row in reader_r:
             if rownum == 0:
                 header = row
@@ -403,6 +401,7 @@ def data_get(request):
                 session = u""
                 author = u""
                 final = u""
+
                 for col in row:
                     if header[colnum] == 'id':
                         rid = col
@@ -418,7 +417,8 @@ def data_get(request):
                         if report.objects.filter(rid=int(rid)).count()==0:
                             rep = report(rid=int(rid), RName=title, Annotation=ann, Reporter=reporter, Topic=topic, Session=session, Organisation='unknown', Author=author, Sponsor='unknown', IsFinal=final )
                             rep.save()
-                            ev = event(Report=rep)
+
+                            ev = event(Conference=conference_name, Report=rep)
                             ev.save()
                     elif header[colnum] == 'xfield005':
                         session = col

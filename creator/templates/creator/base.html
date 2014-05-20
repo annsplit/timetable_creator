@@ -1,13 +1,15 @@
 {% load staticfiles %}
 
 <link rel="stylesheet" type="text/css" href="{% static 'creator/style.css' %}" />
-<p id="pageHeader">Список конференций:</p>
+<p class="simpleHeader">Список конференций:</p>
 {% if conference_list %}
     <ul>
     {% for conf in conference_list %}
-        <li><a href="/timetables/{{ conf.id }}/">
-            {{ conf.CName }}
-            {{ conf.StartDate}}-{{ conf.EndDate }}</a></li>
+        <li style="margin: 6px"><a class="lnk" href="/timetables/{{ conf.id }}/">
+            {{ conf.CName }},
+            {{ conf.StartDate}}-{{ conf.EndDate }}</a>
+            <br><a class="lnk-1" href="/timetables/edit/{{ conf.id }}/">Редактировать доклады конференции</a>
+        </li>
     {% endfor %}
     </ul>
 {% else %}

@@ -40,6 +40,7 @@
         {% else %}
             sections_array[{{section.id}}] = "{{ section.StartTime|date:"Y-m-d H:m:s" }}";
         {% endif %}
+
         section_types[{{ section.id }}] = {{ section.Type_id }};
         sections_width[{{ section.id }}] = {{ section.x_pos }};
         sections_height[{{ section.id }}] = {{ section.y_pos }};
@@ -61,80 +62,87 @@
     {% endfor %}
 
     function saveTimetable(){
+        for (var i=0; i<6; i++){
+            if (i==0)
+                $.ajax({
+                type: 'POST',
+                traditional: true,
+                data: sections_array,
+                url: '/timetables/save/',
+                success: function() {
+                    alert("Временная сетка (положения) успешно сохранена");
+                },
+                error: function() {
+                    alert("Ошибка при сохранении положений");
+                }
+            });
+            if (i==1)
+                $.ajax({
+                type: 'POST',
+                traditional: true,
+                data: sections_width,
+                url: '/timetables/save_width/',
+                success: function() {
+                    alert("Временная сетка (ширина) успешно сохранена");
+                },
+                error: function() {
+                    alert("Ошибка при сохранении ширины");
+                }
+            });
+            if (i==2)
+                $.ajax({
+                type: 'POST',
+                traditional: true,
+                data: sections_height,
+                url: '/timetables/save_height/',
+                success: function() {
+                    alert("Временная сетка (высота) успешно сохранена");
+                },
+                error: function() {
+                    alert("Ошибка при сохранении высоты");
+                }
+            });
 
-        $.ajax({
-            type: 'POST',
-            traditional: true,
-            data: sections_array,
-            url: '/timetables/save/',
-            success: function() {
-                alert("Временная сетка (положения) успешно сохранена");
-            },
-            error: function() {
-                alert("Ошибка при сохранении положений");
-            }
-        });
-        $.ajax({
-            type: 'POST',
-            traditional: true,
-            data: sections_width,
-            url: '/timetables/save_width/',
-            success: function() {
-                alert("Временная сетка (ширина) успешно сохранена");
-            },
-            error: function() {
-                alert("Ошибка при сохранении ширины");
-            }
-        });
-        $.ajax({
-            type: 'POST',
-            traditional: true,
-            data: sections_height,
-            url: '/timetables/save_height/',
-            success: function() {
-                alert("Временная сетка (высота) успешно сохранена");
-            },
-            error: function() {
-                alert("Ошибка при сохранении высоты");
-            }
-        });
-
-        $.ajax({
-            type: 'POST',
-            traditional: true,
-            data: reports_array,
-            url: '/timetables/save_reports/',
-            success: function() {
-                alert("Временная сетка (доклады) успешно сохранена");
-            },
-            error: function() {
-                alert("Ошибка при сохранении докладов");
-            }
-        });
-        $.ajax({
-            type: 'POST',
-            traditional: true,
-            data: reports_width,
-            url: '/timetables/save_reports_width/',
-            success: function() {
-                alert("Временная сетка (доклады ширина) успешно сохранена");
-            },
-            error: function() {
-                alert("Ошибка при сохранении докладов ширина");
-            }
-        });
-        $.ajax({
-            type: 'POST',
-            traditional: true,
-            data: reports_height,
-            url: '/timetables/save_reports_height/',
-            success: function() {
-                alert("Временная сетка (доклады высота) успешно сохранена");
-            },
-            error: function() {
-                alert("Ошибка при сохранении докладов высота");
-            }
-        });
+            if (i==3)
+                $.ajax({
+                type: 'POST',
+                traditional: true,
+                data: reports_array,
+                url: '/timetables/save_reports/',
+                success: function() {
+                    alert("Временная сетка (доклады) успешно сохранена");
+                },
+                error: function() {
+                    alert("Ошибка при сохранении докладов");
+                }
+            });
+            if (i==4)
+                $.ajax({
+                type: 'POST',
+                traditional: true,
+                data: reports_width,
+                url: '/timetables/save_reports_width/',
+                success: function() {
+                    alert("Временная сетка (доклады ширина) успешно сохранена");
+                },
+                error: function() {
+                    alert("Ошибка при сохранении докладов ширина");
+                }
+            });
+            if (i==5)
+                $.ajax({
+                type: 'POST',
+                traditional: true,
+                data: reports_height,
+                url: '/timetables/save_reports_height/',
+                success: function() {
+                    alert("Временная сетка (доклады высота) успешно сохранена");
+                },
+                error: function() {
+                    alert("Ошибка при сохранении докладов высота");
+                }
+            });
+        }
 
     }
 
@@ -188,14 +196,14 @@
 
 
                     }
-
-                    for (var i=1; i<Object.keys(sections_array).length+1; i++)
+                    for (var i=1; i<=Object.keys(sections_array).length+1; i++)
                         if (i == drag_id ){
                             if (time!= "")
                                 sections_array[i] = date_source + " " + time + ":00" ;
 
                             else
                                 sections_array[i] = "";
+
                         }
 
                 }
@@ -211,7 +219,7 @@
                 var width = $(this).width();
                 var height = $(this).height();
                 var section_id=$(this).find("input[type=hidden]").val();
-                for (var i=1; i<Object.keys(sections_array).length+1; i++)
+                for (var i=1; i<=Object.keys(sections_array).length+1; i++)
                     if (i == section_id ){
                         sections_width[i] = width;
                         sections_height[i] = height;
@@ -239,7 +247,7 @@
     });
 
     document.ready($(function(){
-        for (var i=1; i<Object.keys(sections_array).length+1; i++){
+        for (var i=1; i<=Object.keys(sections_array).length+1; i++){
             v = i.toString();
 
             $('#'+v).css("background-color", colors_array[i]);
@@ -277,7 +285,6 @@
 {% load staticfiles %}
 
 <link rel="stylesheet" type="text/css" href="{% static 'creator/style.css' %}" />
-{{ formset }}
 <p id="pageHeader">Раписание научной конференции <b>"{{ conference_name }}"</b></p>
 
 <input onclick="saveTimetable();" type=button id="submit" value="Сохранить временную сетку">

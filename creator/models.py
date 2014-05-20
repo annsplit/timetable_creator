@@ -3,6 +3,11 @@ from django import forms
 
 # Create your models here.
 
+class reports_time(models.Model):
+    plenary = models.IntegerField()
+    sectional = models.IntegerField()
+
+
 
 class conference(models.Model):
     CName = models.CharField(max_length=200)
@@ -10,6 +15,7 @@ class conference(models.Model):
     EndDate = models.DateField()
     DayStart = models.TimeField()
     DayEnd = models.TimeField()
+    RepTime = models.OneToOneField(reports_time)
     def __unicode__(self):  # Python 3: def __str__(self):
         return self.CName
 
@@ -34,11 +40,7 @@ class section_type(models.Model):
         return self.TName
 
 
-class reports_time(models.Model):
-    plenary = models.IntegerField()
-    sectional = models.IntegerField()
-    def __unicode__(self):  # Python 3: def __str__(self):
-        return self.plenary, self.sectional
+
 
 
 class section(models.Model):
@@ -77,6 +79,8 @@ class event(models.Model):
     y_pos = models.FloatField(default=0)
     Section = models.ForeignKey(section, null=True, blank=True)
     Report = models.OneToOneField(report, null=True, blank=True,on_delete=models.SET_NULL,)
-
+    Conference = models.ForeignKey(conference)
+    def __unicode__(self):  # Python 3: def __str__(self):
+        return self.Report
 
 
