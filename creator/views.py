@@ -7,7 +7,7 @@ from django.shortcuts import render, get_object_or_404
 from django.http import Http404
 from django.template import RequestContext, loader
 from django.forms.formsets import formset_factory
-
+import ConfigParser
 
 # Create your views here.
 from django.http import HttpResponse, QueryDict
@@ -268,21 +268,8 @@ def save_reports_height(request):
                 rep.y_pos = newheight
                 rep.save(update_fields=['y_pos'])
     return HttpResponse('Success')
-"""
-def edit_report(request):
-    rep = report.objects.get(id=1)
-    rform = ReportForm(data=request.GET)
-    if request.method == "POST":
-        rform = ReportForm(data = request.POST)
-        if rform.is_valid():
-            rep = rform.save()
-    template = loader.get_template('creator/edit.html')
-    context = RequestContext(request, {
-        'rform': rform,
-    })
-    return HttpResponse(template.render(context))
 
-"""
+
 def change_timecount(request):
     time_list = section_type.objects.all()
     return render(request, 'creator/change_timecounts.html', {'time_list': time_list} )
@@ -307,11 +294,23 @@ def unescape_entities(s):
     return unescaped
 
 
-(username, password) = ("pavt2014", "hjcnjd")
+import os
+name = os.path.dirname(os.path.dirname(__file__)) +"\config.ini"
+Config = ConfigParser.ConfigParser()
+f = open(name, 'rb')
+f.readline()
+Config.readfp(f)
+cid = Config.get("inf", "conference_id")
+authorstable = Config.get("inf", "authors_table")
+reportstable = Config.get("inf", "reports_table")
+lgn = Config.get("inf", "login")
+psswd = Config.get("inf", "psswd")
+(username, password) = (lgn, psswd)
+db = Config.get("inf", "database")
 url = u'http://newserv.srcc.msu.ru/PMA/'
-database = u"agora"
-authorstable = u"conf_pavt2014_appl_members"
-reportstable = u"conf_pavt2014_thes_reports"
+database = db
+#authorstable = u"conf_pavt2014_appl_members"
+#reportstable = u"conf_pavt2014_thes_reports"
 #expertstable = u"conf_pavt2014_experts"
 
 def init_cookie_jar():
