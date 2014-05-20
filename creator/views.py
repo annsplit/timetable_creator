@@ -1,7 +1,7 @@
+from __future__ import unicode_literals
 from django.shortcuts import render
 from datetime import timedelta, datetime, time, date
 from django import forms
-
 # Create your views here.
 from django.shortcuts import render, get_object_or_404
 from django.http import Http404
@@ -43,10 +43,34 @@ def index(request):
     })
     return HttpResponse(template.render(context))
 
-
+@csrf_exempt
 def edit_report(request):
+    if request.method=='POST':
+        rep = request.POST.items()
+        rid=0
+        rname=""
+        topic = ""
+        reporter = ""
+        for r in rep:
+            if "id" in r[0]:
+                rid = r[1]
+            if "RName" in r[0]:
+                rname = r[1]
+            if "Topic" in r[0]:
+                topic = r[1]
+            if "Reporter" in r[0]:
+                reporter = r[1]
+        new_rep = report.objects.get(id=int(rid))
+        new_rep.RName = rname
+        new_rep.Topic = topic
+        new_rep.Reporter = reporter
+        new_rep.save()
+
+            #if "id" in r:
+             #   rid=id
+
     qs = report.objects.order_by('-RName')
-    formset = ReportFormset(request.POST or None, queryset=qs)
+    formset = ReportFormset(queryset=qs)
     if formset.is_valid():
         formset.save()
     return render(request, 'creator/edit.html', {'formset': formset})

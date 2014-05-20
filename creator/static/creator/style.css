@@ -150,3 +150,17 @@
 
             border: 1px solid white;
         }
+
+        .reportForm{
+            width: 500px;
+            height: 20px;
+            border-radius: 3px;
+            margin: 10px;
+        }
+
+        .btn{
+            width: 100px;
+            height: 20px;
+            margin-left: 10px;
+            margin-bottom: 40px;
+        }
