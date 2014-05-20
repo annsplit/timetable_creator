@@ -38,3 +38,7 @@ class RepTimeForm(forms.ModelForm):
 
 ReportFormset = modelformset_factory(report, form=ReportForm, extra=0)
 TypeFormset = modelformset_factory(section_type, form=TypeForm, extra=0)
+
+class LoginForm(forms.Form):
+    username = forms.CharField(label=u'name')
+    password = forms.CharField(label=u'pass', widget=forms.PasswordInput())

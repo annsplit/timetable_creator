@@ -90,3 +90,5 @@ STATICFILES_FINDERS = (
 	'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 	'django.assets.finders.AssetsFinder',
 )
+
+#LOGIN_REDIRECT_URL = '/timetables/index'

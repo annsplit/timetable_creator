@@ -1,5 +1,6 @@
 
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 from datetime import timedelta, datetime, time, date
 from django import forms
 # Create your views here.
@@ -10,9 +11,9 @@ from django.forms.formsets import formset_factory
 import ConfigParser
 
 # Create your views here.
-from django.http import HttpResponse, QueryDict
+from django.http import HttpResponse, HttpResponseRedirect
 from creator.models import report, conference, section, event, section_type, reports_time
-from creator.forms import ReportForm, ReportFormset, TypeForm, TypeFormset, RepTimeForm
+from creator.forms import ReportForm, ReportFormset, TypeForm, TypeFormset, RepTimeForm, LoginForm
 from django.views.decorators.csrf import csrf_exempt
 from datetime import time
 import urllib
@@ -25,16 +26,14 @@ import sys
 import csv
 import traceback
 import codecs
-
 from HTMLParser import HTMLParser
 pars = HTMLParser()
 
 
-class LoginForm(forms.Form):
-    username = forms.CharField(label=u'name')
-    password = forms.CharField(label=u'pass', widget=forms.PasswordInput())
 
 
+
+@login_required
 def index(request):
     conference_list = conference.objects.order_by('-StartDate')
     template = loader.get_template('creator/base.html')
@@ -43,7 +42,33 @@ def index(request):
     })
     return HttpResponse(template.render(context))
 
+from django.contrib.auth import authenticate, login
+def log_in(request):
+    if request.method=="POST":
+        username = request.POST['name']
+        password = request.POST['pass']
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            if user.is_active:
+                login(request, user)
+                index(request)
+        else:
+            return HttpResponse("")
+    form = LoginForm()
+    context = {
+        'form': form
+    }
+    return render(request, 'creator/login.html', context)
+
+
+from django.contrib.auth import logout
+def log_out(request):
+    logout(request)
+    return HttpResponseRedirect("/login/")
+
+
 @csrf_exempt
+@login_required
 def edit_report(request, conference_id):
     if request.method=='POST':
         rep = request.POST.items()
@@ -81,6 +106,7 @@ def edit_report(request, conference_id):
 
 
 @csrf_exempt
+@login_required
 def edit_time(request, conference_id):
     if request.method=='POST':
         time = request.POST.items()
@@ -136,7 +162,7 @@ def edit_time(request, conference_id):
     #})
     #return HttpResponse(template.render(context))
 
-
+@login_required
 def detail(request, conference_id):
     message_list = event.objects.filter(Conference=conference_id).order_by('-Report')
     types_list = section_type.objects.all()
@@ -185,7 +211,7 @@ def detail(request, conference_id):
     #return render(request, 'creator/detail.html', context)
     return render(request, 'creator/detail.html', context)
 
-
+@login_required
 @csrf_exempt
 def save(request):
     if request.method == 'POST':
@@ -201,6 +227,8 @@ def save(request):
             my.save(update_fields=['StartTime'])
     return HttpResponse('Success')
 
+
+@login_required
 @csrf_exempt
 def save_width(request):
     if request.method == 'POST':
@@ -215,6 +243,7 @@ def save_width(request):
     return HttpResponse('Success')
 
 
+@login_required
 @csrf_exempt
 def save_height(request):
     if request.method == 'POST':
@@ -228,6 +257,7 @@ def save_height(request):
     return HttpResponse('Success')
 
 
+@login_required
 @csrf_exempt
 def save_reports(request):
     if request.method == 'POST':
@@ -244,6 +274,7 @@ def save_reports(request):
     return HttpResponse('Success')
 
 
+@login_required
 @csrf_exempt
 def save_reports_width(request):
     if request.method == 'POST':
@@ -257,6 +288,7 @@ def save_reports_width(request):
     return HttpResponse('Success')
 
 
+@login_required
 @csrf_exempt
 def save_reports_height(request):
     if request.method == 'POST':
@@ -270,6 +302,7 @@ def save_reports_height(request):
     return HttpResponse('Success')
 
 
+@login_required
 def change_timecount(request):
     time_list = section_type.objects.all()
     return render(request, 'creator/change_timecounts.html', {'time_list': time_list} )
@@ -395,6 +428,7 @@ def table_to_csv(table, filename, inenc=u'koi8-r', outenc=u'cp1251'):
 def now():
     return datetime.now().strftime(u'%Y%m%d%H%M%S')
 
+@login_required
 def data_get(request):
     try:
         init_cookie_jar()
