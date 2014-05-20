@@ -61,6 +61,7 @@
         colors_array[{{ section.id }}] = "{{ section.Type.color }}";
     {% endfor %}
 
+    {% if usr %}
     function saveTimetable(){
         for (var i=0; i<6; i++){
             if (i==0)
@@ -245,7 +246,7 @@
             }
         });
     });
-
+    {% endif %}
     document.ready($(function(){
         for (var i=1; i<=Object.keys(sections_array).length+1; i++){
             v = i.toString();
@@ -286,7 +287,8 @@
 
 <link rel="stylesheet" type="text/css" href="{% static 'creator/style.css' %}" />
 <p id="pageHeader">Раписание научной конференции <b>"{{ conference_name }}"</b></p>
-
+<a style="margin-left: 20px" class="lnk" href="/timetables/">Вернуться к списку конференций</a><br>
+{%  if usr %}
 <input onclick="saveTimetable();" type=button id="submit" value="Сохранить временную сетку">
 <br>
 
@@ -372,7 +374,7 @@
 {% endif %}
 
 </div>
-
+{% endif %}
 
 {% for day in date_list %}
 <div class="dayOfWeek box_class">

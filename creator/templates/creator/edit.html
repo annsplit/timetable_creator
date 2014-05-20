@@ -17,6 +17,8 @@
             }
             })
         );
+
+
     </script>
 </head>
 <body>
@@ -24,7 +26,9 @@
 
 <link rel="stylesheet" type="text/css" href="{% static 'creator/style.css' %}" />
 
-<p id="pageHeader">Список докладов конференции {{ conference_name }}</p>
+<a style="margin: 20px" class="lnk" href="/timetables/">Вернуться к списку конференций</a><br>
+<p style="font-size: 26px; font-family: arial; margin-left: 20px">Список докладов конференции "{{ conference_name }}"</p>
+
 <div class="list">
 {% if formset != None %}
         {% for form in formset %}

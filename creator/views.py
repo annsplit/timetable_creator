@@ -29,20 +29,24 @@ import codecs
 from HTMLParser import HTMLParser
 pars = HTMLParser()
 
+from django.contrib.auth import authenticate, login
+guest = True
 
 
 
-
-@login_required
 def index(request):
     conference_list = conference.objects.order_by('-StartDate')
     template = loader.get_template('creator/base.html')
+    usr = True
+    if (str(request.user) == "AnonymousUser"):
+        usr = False
     context = RequestContext(request, {
         'conference_list': conference_list,
+        'usr': usr
     })
     return HttpResponse(template.render(context))
 
-from django.contrib.auth import authenticate, login
+
 def log_in(request):
     if request.method=="POST":
         username = request.POST['name']
@@ -56,7 +60,7 @@ def log_in(request):
             return HttpResponse("")
     form = LoginForm()
     context = {
-        'form': form
+        'form': form,
     }
     return render(request, 'creator/login.html', context)
 
@@ -162,7 +166,7 @@ def edit_time(request, conference_id):
     #})
     #return HttpResponse(template.render(context))
 
-@login_required
+
 def detail(request, conference_id):
     message_list = event.objects.filter(Conference=conference_id).order_by('-Report')
     types_list = section_type.objects.all()
@@ -197,6 +201,9 @@ def detail(request, conference_id):
     form = ReportForm(instance=r)
     formset = ReportFormset(initial=report)
     reports_time_list = reports_time.objects.get(conference=conference_id)
+    usr = True
+    if (str(request.user) == "AnonymousUser"):
+        usr = False
     context = {'message_list': message_list,
                'conference_name': conference_name,
                'date_list': date_list,
@@ -205,8 +212,8 @@ def detail(request, conference_id):
                'section_list': section_list,
                'time_list': time_list,
                'types_list': types_list,
-               'reports_time_list': reports_time_list
-
+               'reports_time_list': reports_time_list,
+                'usr': usr
     }
     #return render(request, 'creator/detail.html', context)
     return render(request, 'creator/detail.html', context)

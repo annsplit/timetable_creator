@@ -8,8 +8,10 @@
         <li style="margin: 6px"><a class="lnk" href="/timetables/{{ conf.id }}/">
             {{ conf.CName }},
             {{ conf.StartDate}}-{{ conf.EndDate }}</a>
+            {% if usr  %}
             <br><a class="lnk-1" href="/timetables/edit/{{ conf.id }}/">Редактировать доклады конференции</a>
             <br><a class="lnk-1" href="/timetables/change_timecounts/{{ conf.id }}/">Редактировать продолжительность секций и докладов по умолчанию</a>
+            {% endif %}
         </li>
     {% endfor %}
     </ul>
