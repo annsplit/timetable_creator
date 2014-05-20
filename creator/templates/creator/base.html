@@ -9,9 +9,14 @@
             {{ conf.CName }},
             {{ conf.StartDate}}-{{ conf.EndDate }}</a>
             <br><a class="lnk-1" href="/timetables/edit/{{ conf.id }}/">Редактировать доклады конференции</a>
+            <br><a class="lnk-1" href="/timetables/change_timecounts/{{ conf.id }}/">Редактировать продолжительность секций и докладов по умолчанию</a>
         </li>
     {% endfor %}
     </ul>
 {% else %}
     <p>No conferences are available.</p>
 {% endif %}
+
+<a style="margin: 10px" class="lnk" href="/timetables/data_get/{{ conf.id }}/">Импортировать данные о докладах (настройки из файла config)</a>
+
+

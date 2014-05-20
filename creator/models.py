@@ -36,6 +36,7 @@ class section_type(models.Model):
     TName = models.CharField(max_length=200)
     color = models.CharField(max_length=40, choices=COLOR_CHOICES)
     time_default = models.IntegerField()
+    Conference = models.ForeignKey(conference)
     def __unicode__(self):  # Python 3: def __str__(self):
         return self.TName
 
@@ -68,6 +69,7 @@ class report(models.Model):
     Author = models.CharField(max_length=200)
     Sponsor = models.CharField(max_length=200, blank=True)
     IsFinal = models.BooleanField()
+    Conference = models.ForeignKey(conference)
 
     def __unicode__(self):  # Python 3: def __str__(self):
         return self.RName

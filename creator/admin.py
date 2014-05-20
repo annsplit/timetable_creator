@@ -7,6 +7,7 @@ from creator.models import report, conference, section, section_type, event, rep
 
 class report_admin(admin.ModelAdmin):
     fieldsets = [
+        ('Conference',               {'fields': ['Conference']}),
         ('Name',               {'fields': ['RName']}),
         ('Annotation',   {'fields': ['Annotation']}),
         ('Reporter',              {'fields': ['Reporter']}),
@@ -50,7 +51,8 @@ class section_type_admin(admin.ModelAdmin):
     fieldsets = [
         ('Type', {'fields': ['TName']}),
         ('color', {'fields': ['color']}),
-        ('time_default', {'fields': ['time_default']})
+        ('time_default', {'fields': ['time_default']}),
+        ('Conference',               {'fields': ['Conference']})
 
     ]
     list_display = ('TName', 'color')

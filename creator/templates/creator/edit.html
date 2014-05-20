@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <script>
+        var frm = $('.reportForm');
+            frm.submit(function () $.ajax({
+            type: 'POST',
+            traditional: true,
+            data: frm.serialize(),
+            url: '/timetables/edit_report/',
+            success: function() {
+                alert("!!!");
+            },
+            error: function() {
+                alert(":(");
+            }
+            })
+        );
+    </script>
+</head>
+<body>
+{% load staticfiles %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'creator/style.css' %}" />
+
+<p id="pageHeader">Список докладов конференции {{ conference_name }}</p>
+<div class="list">
+{% if formset != None %}
+        {% for form in formset %}
+                <form method="POST" action="">
+                {{ form }}
+                <input type="submit" class="btn" onclick="saveReport();" value="Сохранить"><br>
+                </form>
+        {% endfor %}
+    {% else %}No reports are available
+{% endif %}
+</div>
+</body>
+</html>

@@ -12,7 +12,7 @@ from django.forms.formsets import formset_factory
 # Create your views here.
 from django.http import HttpResponse, QueryDict
 from creator.models import report, conference, section, event, section_type, reports_time
-from creator.forms import ReportForm, ReportFormset
+from creator.forms import ReportForm, ReportFormset, TypeForm, TypeFormset, RepTimeForm
 from django.views.decorators.csrf import csrf_exempt
 from datetime import time
 import urllib
@@ -65,13 +65,71 @@ def edit_report(request, conference_id):
         new_rep.Topic = topic
         new_rep.Reporter = reporter
         new_rep.save()
+    conference_name = conference.objects.get(id=conference_id)
+    qs = report.objects.filter(Conference=conference_id).order_by('-RName')
+    if (qs.count()==0):
+        formset=None
+    else:
+        formset = ReportFormset(queryset=qs)
+        if formset.is_valid():
+            formset.save()
+    context = {
+        'formset': formset,
+        'conference_name': conference_name
+    }
+    return render(request, 'creator/edit.html', context)
 
-    qs = report.objects.order_by('-RName')
-    formset = ReportFormset(queryset=qs)
-    if formset.is_valid():
-        formset.save()
-    return render(request, 'creator/edit.html', {'formset': formset})
 
+@csrf_exempt
+def edit_time(request, conference_id):
+    if request.method=='POST':
+        time = request.POST.items()
+        print(time)
+        rst = 0
+        rpt = 0
+        tid = 0
+        tname = ""
+        count = ""
+        for r in time:
+            if "id" in r[0]:
+                tid = r[1]
+            if "TName" in r[0]:
+                tname = r[1]
+            if "time_default" in r[0]:
+                count = r[1]
+            if "sectional" in r[0]:
+                rst = r[1]
+            if "plenary" in r[0]:
+                rpt = r[1]
+        if (tid):
+            new_t = section_type.objects.get(id=int(tid))
+            new_t.TName = tname
+            new_t.time_default = count
+            new_t.save()
+        if (rst != 0):
+            new_t = reports_time.objects.get(conference=conference_id)
+            new_t.sectional = rst
+            new_t.save()
+        if (rpt != 0):
+            new_t = reports_time.objects.get(conference=conference_id)
+            new_t.plenary = rpt
+            new_t.save()
+    conference_name = conference.objects.get(id=conference_id)
+    qs = section_type.objects.filter(Conference=conference_id).order_by('-TName')
+    if (qs.count() == 0):
+        formset = None
+    else:
+        formset = TypeFormset(queryset=qs)
+        if formset.is_valid():
+            formset.save()
+    rep = reports_time.objects.get(conference=conference_id)
+    tform = RepTimeForm(instance=rep)
+    context = {
+        'formset': formset,
+        'tform': tform,
+        'conference_name': conference_name
+    }
+    return render(request, 'creator/change_timecounts.html', context)
     #template = loader.get_template('creator/edit.html')
     #context = RequestContext(request, {
     #    'formset': ReportFormset,
@@ -415,7 +473,7 @@ def data_get(request):
                     elif header[colnum] == 'xfield016':
                         topic = col
                         if report.objects.filter(rid=int(rid)).count()==0:
-                            rep = report(rid=int(rid), RName=title, Annotation=ann, Reporter=reporter, Topic=topic, Session=session, Organisation='unknown', Author=author, Sponsor='unknown', IsFinal=final )
+                            rep = report(rid=int(rid), RName=title, Annotation=ann, Reporter=reporter, Topic=topic, Session=session, Organisation='unknown', Author=author, Sponsor='unknown', IsFinal=final, Conference=conference_name )
                             rep.save()
 
                             ev = event(Conference=conference_name, Report=rep)

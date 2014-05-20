@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <script>
+        var frm = $('.reportForm');
+            frm.submit(function () $.ajax({
+            type: 'POST',
+            traditional: true,
+            data: frm.serialize(),
+            url: '/timetables/change_timecounts/',
+            success: function() {
+                alert("!!!");
+            },
+            error: function() {
+                alert(":(");
+            }
+            })
+        );
+    </script>
+</head>
+<body>
+{% load staticfiles %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'creator/style.css' %}" />
+
+<p id="pageHeader">Продолжительность секций/докладов по умолчанию в конференции {{ conference_name }}</p>
+<div class="list">
+
+{%  if tform %}
+    <form method="POST" action="">
+        {{ tform }}
+        <input type="submit" class="btn" onclick="saveReport();" value="Сохранить"><br>
+    </form>
+{% endif %}
+
+
+{% if formset != None %}
+        {% for form in formset %}
+                <form method="POST" action="">
+                {{ form }}
+                <input type="submit" class="btn" onclick="saveReport();" value="Сохранить"><br>
+                </form>
+        {% endfor %}
+{% endif %}
+
+</div>
+</body>
+</html>

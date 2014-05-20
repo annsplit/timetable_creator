@@ -24,11 +24,10 @@
             font-size: 13;
             background-color: aliceblue;
             float: right;
-            height: 80%;
-            position: fixed;
+            height: auto;
             right: 20px;
             padding: 5px;
-
+            position: absolute;
         }
 
 
@@ -151,11 +150,19 @@
             border: 1px solid white;
         }
 
+        .list{
+            font-family: arial;
+            margin-left: 20px;
+        }
+
         .reportForm{
             width: 500px;
             height: 20px;
             border-radius: 3px;
-            margin: 10px;
+            margin: 5px;
+            display: block;
+            font-size: 14;
+            font-family: arial;
         }
 
         .btn{
@@ -185,9 +192,16 @@
             text-decoration: none;
             color:black;
             font-family: arial;
-            font-size: 20;
+            font-size: 16;
         }
 
         .lnk-1:visited{
             color: black;
+        }
+
+        .lnk:hover{
+            color: lightgreen;
+        }
+        .lnk-1:hover{
+            color: lightgreen;
         }
