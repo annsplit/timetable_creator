@@ -79,7 +79,4 @@ class event(models.Model):
     Report = models.OneToOneField(report, null=True, blank=True,on_delete=models.SET_NULL,)
 
 
-class ReportForm(forms.ModelForm):
-    class Meta:
-        model = report
-        fields = ["RName", "Reporter", "Topic"]
+

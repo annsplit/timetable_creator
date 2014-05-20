@@ -277,7 +277,7 @@
 {% load staticfiles %}
 
 <link rel="stylesheet" type="text/css" href="{% static 'creator/style.css' %}" />
-
+{{ formset }}
 <p id="pageHeader">Раписание научной конференции <b>"{{ conference_name }}"</b></p>
 
 <input onclick="saveTimetable();" type=button id="submit" value="Сохранить временную сетку">
@@ -443,7 +443,6 @@
 
 
 
-{% comment %}
-{{ form }}
-{% endcomment %}
+
+
 </body>

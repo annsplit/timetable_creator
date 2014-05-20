@@ -6,13 +6,13 @@ from django import forms
 from django.shortcuts import render, get_object_or_404
 from django.http import Http404
 from django.template import RequestContext, loader
-
+from django.forms.formsets import formset_factory
 
 
 # Create your views here.
 from django.http import HttpResponse, QueryDict
 from creator.models import report, conference, section, event, section_type, reports_time
-from creator.forms import ReportForm
+from creator.forms import ReportForm, ReportFormset
 from django.views.decorators.csrf import csrf_exempt
 from datetime import time
 import urllib
@@ -44,6 +44,20 @@ def index(request):
     return HttpResponse(template.render(context))
 
 
+def edit_report(request):
+    qs = report.objects.order_by('-RName')
+    formset = ReportFormset(request.POST or None, queryset=qs)
+    if formset.is_valid():
+        formset.save()
+    return render(request, 'creator/edit.html', {'formset': formset})
+
+    #template = loader.get_template('creator/edit.html')
+    #context = RequestContext(request, {
+    #    'formset': ReportFormset,
+    #})
+    #return HttpResponse(template.render(context))
+
+
 def detail(request, conference_id):
     message_list = event.objects.all().order_by('-Report')
     types_list = section_type.objects.all()
@@ -72,12 +86,17 @@ def detail(request, conference_id):
         time_list.append((datetime.combine(date.today(), conference_name.DayStart) + timedelta(minutes=i)).time())
 
 
-    form = LoginForm()
+
+    #form = LoginForm()
+    r = report.objects.get(id=1)
+    form = ReportForm(instance=r)
+    formset = ReportFormset(initial=report)
     reports_time_list = reports_time.objects.last()
     context = {'message_list': message_list,
                'conference_name': conference_name,
                'date_list': date_list,
                'form': form,
+               'formset':formset,
                'section_list': section_list,
                'time_list': time_list,
                'types_list': types_list,
@@ -169,7 +188,7 @@ def save_reports_height(request):
                 rep.y_pos = newheight
                 rep.save(update_fields=['y_pos'])
     return HttpResponse('Success')
-
+"""
 def edit_report(request):
     rep = report.objects.get(id=1)
     rform = ReportForm(data=request.GET)
@@ -183,7 +202,7 @@ def edit_report(request):
     })
     return HttpResponse(template.render(context))
 
-
+"""
 def change_timecount(request):
     time_list = section_type.objects.all()
     return render(request, 'creator/change_timecounts.html', {'time_list': time_list} )
