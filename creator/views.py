@@ -1,4 +1,4 @@
-
+# -*- coding: utf-8 -*-
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from datetime import timedelta, datetime, time, date
@@ -76,6 +76,16 @@ def create_pdf(request, conference_id):
     from reportlab.pdfgen import canvas
     from reportlab.pdfbase import pdfmetrics
     from reportlab.pdfbase.ttfonts import TTFont
+    from django.db.models import Q
+    from reportlab.lib import colors
+    from reportlab.lib.colors import lightgrey, black
+    from reportlab.lib.pagesizes import letter
+    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+    from django.utils import formats
+    from reportlab.pdfbase.pdfmetrics import stringWidth
+    from reportlab.rl_config import defaultPageSize
+
+    PAGE_WIDTH = defaultPageSize[0]
 
     MyFontObject = TTFont('Arial', 'creator/static/creator/arial.ttf')
     pdfmetrics.registerFont(MyFontObject)
@@ -85,10 +95,56 @@ def create_pdf(request, conference_id):
 
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="timetable.pdf"'
-
+    #wordWrap=True.
     p = canvas.Canvas(response)
-    p.setFont("Arial",9)
-    p.drawString(100, 100, cname)
+    p.setFont("Arial",12)
+    cname_full = u"Расписание конференции " + '"' + cname + '"'
+    header_text_width = cname_full.__len__()*3
+    sections = section.objects.filter(Conference=conference_id, StartTime__contains=":")
+    day = formats.date_format(sections[0].StartTime, "DATE_FORMAT")
+    print(day)
+
+    #p.setStrokeColor(gray)
+    p.drawCentredString(int(PAGE_WIDTH) / 2.0, 820, cname_full)
+    #p.drawString((int(PAGE_WIDTH) - header_text_width) / 2.0 - header_text_width/2.0, 820, cname_full)
+    p.setFillColor(lightgrey)
+    p.rect(0, 780, int(PAGE_WIDTH),20,fill=1)
+    p.setFillColor(black)
+    p.drawCentredString(int(PAGE_WIDTH) / 2.0, 785, day)
+    step=17
+    for s in sections:
+        step_2 = 10
+        if (day != formats.date_format(s.StartTime, "DATE_FORMAT")):
+            day = formats.date_format(s.StartTime, "DATE_FORMAT")
+            p.setFillColor(lightgrey)
+            p.rect(0, 780-s.id*step - step_2, int(PAGE_WIDTH),20,fill=1)
+            p.setFillColor(black)
+            p.drawCentredString(int(PAGE_WIDTH) / 2.0, 785-s.id*step - step_2, day)
+            step_2 = step_2+15
+        st = []
+        st.append(s.SName + " (" + s.Place + ")")
+        st.append(u"Председатель: " + s.Person)
+
+        for i in st:
+            text_width = i.__len__()*3
+            p.drawCentredString(int(PAGE_WIDTH) / 2.0, 785-s.id*step - step_2, i)
+            step_2=step_2+15
+
+    #elements = []
+
+    #data= [[cname, '01', '02', '03', '04'],
+    #       ['10', '11', '12', '13', '14'],
+    #       ['20', '21', '22', '23', '24'],
+    #       ['30', '31', '32', '33', '34']]
+    #t=Table(data)
+    #t.setStyle(TableStyle([('BACKGROUND',(1,1),(-2,-2),colors.green),
+                           #('TEXTCOLOR',(0,0),(1,-1),colors.red)]))
+    #elements.append(t)
+    # write the document to disk
+    #t.wrapOn(p,100,100)
+    #t.drawOn(p,100,100)
+    #p.build(elements)
+    #p.drawString(100, 100, cname)
 
     p.showPage()
     p.save()
