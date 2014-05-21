@@ -76,13 +76,8 @@ def create_pdf(request, conference_id):
     from reportlab.pdfgen import canvas
     from reportlab.pdfbase import pdfmetrics
     from reportlab.pdfbase.ttfonts import TTFont
-    from django.db.models import Q
-    from reportlab.lib import colors
     from reportlab.lib.colors import lightgrey, black
-    from reportlab.lib.pagesizes import letter
-    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
     from django.utils import formats
-    from reportlab.pdfbase.pdfmetrics import stringWidth
     from reportlab.rl_config import defaultPageSize
 
     PAGE_WIDTH = defaultPageSize[0]
@@ -186,23 +181,6 @@ def create_pdf(request, conference_id):
                     step = 20
                     pdfmetrics.registerFont(MyFontObject)
                     p.setFont("Arial",12)
-
-
-    #elements = []
-
-    #data= [[cname, '01', '02', '03', '04'],
-    #       ['10', '11', '12', '13', '14'],
-    #       ['20', '21', '22', '23', '24'],
-    #       ['30', '31', '32', '33', '34']]
-    #t=Table(data)
-    #t.setStyle(TableStyle([('BACKGROUND',(1,1),(-2,-2),colors.green),
-                           #('TEXTCOLOR',(0,0),(1,-1),colors.red)]))
-    #elements.append(t)
-    # write the document to disk
-    #t.wrapOn(p,100,100)
-    #t.drawOn(p,100,100)
-    #p.build(elements)
-    #p.drawString(100, 100, cname)
 
     p.showPage()
     p.save()
