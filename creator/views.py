@@ -71,6 +71,31 @@ def log_out(request):
     return HttpResponseRedirect("/login/")
 
 
+def create_pdf(request, conference_id):
+    import reportlab
+    from reportlab.pdfgen import canvas
+    from reportlab.pdfbase import pdfmetrics
+    from reportlab.pdfbase.ttfonts import TTFont
+
+    MyFontObject = TTFont('Arial', 'creator/static/creator/arial.ttf')
+    pdfmetrics.registerFont(MyFontObject)
+
+    c = conference.objects.get(id=conference_id)
+    cname = c.CName
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="timetable.pdf"'
+
+    p = canvas.Canvas(response)
+    p.setFont("Arial",9)
+    p.drawString(100, 100, cname)
+
+    p.showPage()
+    p.save()
+    return response
+
+
+
 @csrf_exempt
 @login_required
 def edit_report(request, conference_id):
