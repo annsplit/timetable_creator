@@ -62,90 +62,7 @@
     {% endfor %}
 
     {% if usr %}
-    function saveTimetable(){
-        for (var i=0; i<6; i++){
-            if (i==0)
-                $.ajax({
-                type: 'POST',
-                traditional: true,
-                data: sections_array,
-                url: '/timetables/save/',
-                success: function() {
-                    alert("Временная сетка (положения) успешно сохранена");
-                },
-                error: function() {
-                    alert("Ошибка при сохранении положений");
-                }
-            });
-            if (i==1)
-                $.ajax({
-                type: 'POST',
-                traditional: true,
-                data: sections_width,
-                url: '/timetables/save_width/',
-                success: function() {
-                    alert("Временная сетка (ширина) успешно сохранена");
-                },
-                error: function() {
-                    alert("Ошибка при сохранении ширины");
-                }
-            });
-            if (i==2)
-                $.ajax({
-                type: 'POST',
-                traditional: true,
-                data: sections_height,
-                url: '/timetables/save_height/',
-                success: function() {
-                    alert("Временная сетка (высота) успешно сохранена");
-                },
-                error: function() {
-                    alert("Ошибка при сохранении высоты");
-                }
-            });
 
-            if (i==3)
-                $.ajax({
-                type: 'POST',
-                traditional: true,
-                data: reports_array,
-                url: '/timetables/save_reports/',
-                success: function() {
-                    alert("Временная сетка (доклады) успешно сохранена");
-                },
-                error: function() {
-                    alert("Ошибка при сохранении докладов");
-                }
-            });
-            if (i==4)
-                $.ajax({
-                type: 'POST',
-                traditional: true,
-                data: reports_width,
-                url: '/timetables/save_reports_width/',
-                success: function() {
-                    alert("Временная сетка (доклады ширина) успешно сохранена");
-                },
-                error: function() {
-                    alert("Ошибка при сохранении докладов ширина");
-                }
-            });
-            if (i==5)
-                $.ajax({
-                type: 'POST',
-                traditional: true,
-                data: reports_height,
-                url: '/timetables/save_reports_height/',
-                success: function() {
-                    alert("Временная сетка (доклады высота) успешно сохранена");
-                },
-                error: function() {
-                    alert("Ошибка при сохранении докладов высота");
-                }
-            });
-        }
-
-    }
 
     $(function() {
         $( "#messageList, .timegrid, .timedrop" ).sortable({
@@ -153,17 +70,18 @@
             placeholder: "ui-state-highlight",
             start: function(event, ui) {
                 var drag_id = ui.item.attr('id');
-
                 ui.item.data('drag_id', drag_id);
             },
             update: function(event, ui){
+
                 var drag_id = ui.item.data('drag_id');
                 var dest = event.target.id;
                 if (drag_id.indexOf("r") > -1){
+
                     var sid = $(this).closest(".sid_class").attr('id');
                     var c = $(this).closest(".sid_class").attr('class');
                     var report_id = drag_id;
-                    report_id = report_id.replace("r","");
+                    report_id = report_id.replace("r_","");
                     int_report_id = +report_id;
                     if (c.indexOf("resizablePlenary") > -1){
                         new_height = rep_p;
@@ -212,6 +130,111 @@
         }).disableSelection();
     });
 
+    function saveTimetable(){
+        for (var i=0; i<7; i++){
+            if (i==0)
+                $.ajax({
+                type: 'POST',
+                traditional: true,
+                data: sections_array,
+                url: '/timetables/save/',
+                success: function() {
+                    alert("Временная сетка (положения) успешно сохранена");
+                },
+                error: function() {
+                    alert("Ошибка при сохранении положений");
+                }
+            });
+            if (i==1)
+                $.ajax({
+                type: 'POST',
+                traditional: true,
+                data: sections_width,
+                url: '/timetables/save_width/',
+                success: function() {
+                    alert("Временная сетка (ширина) успешно сохранена");
+                },
+                error: function() {
+                    alert("Ошибка при сохранении ширины");
+                }
+            });
+            if (i==2)
+                $.ajax({
+                type: 'POST',
+                traditional: true,
+                data: sections_height,
+                url: '/timetables/save_height/',
+                success: function() {
+                    alert("Временная сетка (высота) успешно сохранена");
+                },
+                error: function() {
+                    alert("Ошибка при сохранении высоты");
+                }
+            });
+
+            if (i==3){
+                $.ajax({
+                type: 'POST',
+                traditional: true,
+                data: reports_array,
+                url: '/timetables/save_reports/',
+                success: function() {
+                    alert("Временная сетка (доклады) успешно сохранена");
+                },
+                error: function() {
+                    alert("Ошибка при сохранении докладов");
+                }
+            });
+            }
+            if (i==4)
+                $.ajax({
+                type: 'POST',
+                traditional: true,
+                data: reports_width,
+                url: '/timetables/save_reports_width/',
+                success: function() {
+                    alert("Временная сетка (доклады ширина) успешно сохранена");
+                },
+                error: function() {
+                    alert("Ошибка при сохранении докладов ширина");
+                }
+            });
+            if (i==5)
+                $.ajax({
+                type: 'POST',
+                traditional: true,
+                data: reports_height,
+                url: '/timetables/save_reports_height/',
+                success: function() {
+                    alert("Временная сетка (доклады высота) успешно сохранена");
+                },
+                error: function() {
+                    alert("Ошибка при сохранении докладов высота");
+                }
+            });
+            if (i==6){
+                var reports_order = {};
+                {%  for s in section_list %}
+                    reports_order[{{ s.id }}] = $("#sec" + {{ s.id }}).sortable('serialize');
+                {% endfor %}
+                $.ajax({
+                    type: 'POST',
+                    traditional: true,
+                    data: reports_order,
+                    url: '/timetables/save_reports_order/',
+                    success: function() {
+                        alert("Временная сетка (доклады порядок) успешно сохранена");
+                    },
+                    error: function() {
+                        alert("Ошибка при сохранении докладов порядок");
+                    }
+                });
+            }
+
+        }
+
+    }
+
     jQuery(function() {
         jQuery(" .resizablePlenary, .resizableSectional, .resizableSimple").resizable({
             minWidth: "300",
@@ -236,7 +259,7 @@
                 var width = $(this).width();
                 var height = $(this).height();
                 var report_id = $(this).attr('id');
-                report_id = report_id.replace("r","");
+                report_id = report_id.replace("r_","");
                 int_report_id = +report_id;
                 for (var i=1; i<Object.keys(reports_array).length+1; i++)
                     if (i == int_report_id){
@@ -263,9 +286,9 @@
         for (var i=1; i<Object.keys(reports_array).length+1; i++){
             v = i.toString();
             if (reports_width[i] > 0)
-                $('#r'+v).css("width", reports_width[i]);
+                $('#r_'+v).css("width", reports_width[i]);
             if (reports_height[i] > 0)
-                $('#r'+v).css("height", reports_height[i]);
+                $('#r_'+v).css("height", reports_height[i]);
 
         }
     })
@@ -300,7 +323,7 @@
 
         {% for report in message_list %}
             {% if report.Section_id == None %}
-                <li class="message" id="r{{ report.id }}">
+                <li class="message" id="r_{{ report.id }}">
                     {{ report.Report.RName }}
                     <br><i>{{ report.Report.Reporter }}</i>
                 </li>
@@ -314,7 +337,7 @@
 
             {% if section.Type.TName == "Пленарные" and section.StartTime == None %}
                 <li class="resizablePlenary sid_class" id="{{ section.id }}">
-                    <ul class="connectedSortable timegrid plenary">
+                    <ul class="connectedSortable timegrid plenary" id="sec{{ section.id }}">
                         {{ section.SName }}
                         <br><i>{{ section.Person }}</i>
                         <br>
@@ -335,7 +358,7 @@
 
             {% elif section.Type.TName == "Секционные" and section.StartTime == None%}
                  <li class="resizableSectional  sid_class" id="{{ section.id }}">
-                     <ul class="connectedSortable timegrid sectional">
+                     <ul class="connectedSortable timegrid sectional" id="sec{{ section.id }}">
                          {{ section.SName }}
                          <br><i>{{ section.Person }}</i>
                          <br>
@@ -390,7 +413,7 @@
                     {% if section.StartTime|time:"H:i" == stime|time:"H:i" and section.StartTime.date == day %}
                         {% if section.Type.TName == "Пленарные" %}
                             <li class="resizablePlenary sid_class" id="{{ section.id }}">
-                                <ul class="connectedSortable timegrid plenary">
+                                <ul class="connectedSortable timegrid plenary" id="sec{{ section.id }}">
 
                                     {{ section.SName }}
                                     <br><i>{{ section.Person }}</i>
@@ -398,7 +421,7 @@
                                     <br>
                                     {% for report in message_list %}
                                         {% if report.Section_id == section.id %}
-                                            <li class="message" id="r{{ report.id }}">
+                                            <li class="message" id="r_{{ report.id }}">
                                                 {{ report.Report.RName }}
                                                 <br><i>{{ report.Report.Reporter }}</i>
                                             </li>
@@ -412,7 +435,7 @@
 
                         {% elif section.Type.TName == "Секционные" %}
                             <li class="resizableSectional  sid_class" id="{{ section.id }}">
-                                <ul class="connectedSortable timegrid sectional">
+                                <ul class="connectedSortable timegrid sectional" id="sec{{ section.id }}">
 
                                     {{ section.SName }}
                                     <br><i>{{ section.Person }}</i>
@@ -420,7 +443,7 @@
                                     <br>
                                     {% for report in message_list %}
                                         {% if report.Section_id == section.id %}
-                                            <li class="message" id="r{{ report.id }}">
+                                            <li class="message" id="r_{{ report.id }}">
                                                 {{ report.Report.RName }}
                                                 <br><i>{{ report.Report.Reporter }}</i>
                                             </li>

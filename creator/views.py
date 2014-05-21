@@ -288,7 +288,7 @@ def edit_time(request, conference_id):
 
 
 def detail(request, conference_id):
-    message_list = event.objects.filter(Conference=conference_id).order_by('-Report')
+    message_list = event.objects.filter(Conference=conference_id).order_by('Section', 'order')
     types_list = section_type.objects.all()
     conference_name = get_object_or_404(conference, pk=conference_id)
 
@@ -426,6 +426,25 @@ def save_reports_height(request):
                 newheight = height[h]
                 rep.y_pos = newheight
                 rep.save(update_fields=['y_pos'])
+    return HttpResponse('Success')
+
+
+@login_required
+@csrf_exempt
+def save_reports_order(request):
+    if request.method == 'POST':
+        order = request.POST.items()
+        if order:
+            for o in order:
+                s_order = o[1].split("&")
+                count = 1
+                for item in s_order:
+                    r_id = item[4:]
+                    e = event.objects.get(Report=r_id)
+                    e.order = count
+                    e.save()
+                    print(e.order)
+                    count = count + 1
     return HttpResponse('Success')
 
 

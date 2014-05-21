@@ -16,6 +16,7 @@ urlpatterns = patterns('',
     url(r'^save_reports/$', views.save_reports, name='save_reports'),
     url(r'^save_reports_width/$', views.save_reports_width, name='save_reports_width'),
     url(r'^save_reports_height/$', views.save_reports_height, name='save_reports_height'),
+    url(r'^save_reports_order/$', views.save_reports_order, name='save_reports_order'),
     url(r'^data_get/$', views.data_get, name='data_get'),
 
     # ex: /polls/5/

@@ -18,8 +18,12 @@
 {% else %}
     <p>No conferences are available.</p>
 {% endif %}
-
-<a style="margin: 10px" class="lnk" href="/timetables/data_get/{{ conf.id }}/">Импортировать данные о докладах (настройки из файла config)</a>
+{% if usr  %}
+<a style="margin: 10px" class="lnk" href="/timetables/data_get/">Импортировать данные о докладах (настройки из файла config)</a>
 
 <br><br><br>
 <a style="margin: 10px" class="lnk" href="/log_out/">Выйти</a>
+
+{% else %}
+    <a style="margin: 10px" class="lnk" href="/login/">Войти в систему</a>
+{% endif %}

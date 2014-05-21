@@ -61,7 +61,7 @@ class section(models.Model):
 class report(models.Model):
     rid = models.IntegerField()
     RName = models.CharField(max_length=200)
-    Annotation = models.CharField(max_length=200)
+    Annotation = models.TextField()
     Reporter = models.CharField(max_length=200)
     Topic = models.CharField(max_length=200)
     Session = models.CharField(max_length=200)
@@ -76,11 +76,11 @@ class report(models.Model):
 
 
 class event(models.Model):
-    order = models.IntegerField(null=True, blank=True)
+    order = models.IntegerField(default=0)
     x_pos = models.FloatField(default=0)
     y_pos = models.FloatField(default=0)
     Section = models.ForeignKey(section, null=True, blank=True)
-    Report = models.OneToOneField(report, null=True, blank=True,on_delete=models.SET_NULL,)
+    Report = models.OneToOneField(report, null=True, blank=True,on_delete=models.SET_NULL)
     Conference = models.ForeignKey(conference)
     def __unicode__(self):  # Python 3: def __str__(self):
         return self.Report

@@ -4,11 +4,14 @@
     <title></title>
 </head>
 <body>
+{% load staticfiles %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'creator/style.css' %}" />
 {% if form.errors %}
     <p>Your username and password didn't match. Please try again.</p>
 {% endif %}
 
-<form method="post" action="">
+<form method="post" action="" style="margin: 20px">
 {% csrf_token %}
     <table>
         <tr>
@@ -21,7 +24,8 @@
         </tr>
     </table>
 
-    <input type="submit" value="Войти в систему" />
+    <input type="submit" value="Войти в систему" /><br><br>
+    <a  class="lnk" href="/timetables/">Войти как гость</a>
     <input type="hidden" name="next" value="../timetables/" />
 </form>
 </body>
