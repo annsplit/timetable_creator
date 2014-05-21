@@ -112,18 +112,17 @@ def create_pdf(request, conference_id):
     p.rect(0, 780, int(PAGE_WIDTH),20,fill=1)
     p.setFillColor(black)
     p.drawCentredString(int(PAGE_WIDTH) / 2.0, 785, day)
-    step=17
-    step_2 = 15
+    step=20
     t_format = '%H:%M'
     for s in sections:
-
         if (day != formats.date_format(s.StartTime, "DATE_FORMAT")):
             day = formats.date_format(s.StartTime, "DATE_FORMAT")
             p.setFillColor(lightgrey)
-            p.rect(0, 780-s.id*step - step_2, int(PAGE_WIDTH),20,fill=1)
+            step = step+40
+            p.rect(0, 780-step, int(PAGE_WIDTH),20,fill=1)
             p.setFillColor(black)
-            p.drawCentredString(int(PAGE_WIDTH) / 2.0, 785-s.id*step - step_2, day)
-            step_2 = step_2+20
+            p.drawCentredString(int(PAGE_WIDTH) / 2.0, 785-step, day)
+            step = step+20
 
         st = []
 
@@ -132,8 +131,8 @@ def create_pdf(request, conference_id):
             st.append(u"Председатель: " + s.Person)
             for i in st:
                 text_width = i.__len__()*3
-                p.drawCentredString(int(PAGE_WIDTH) / 2.0, 785-s.id*step - step_2, i)
-                step_2=step_2+15
+                p.drawCentredString(int(PAGE_WIDTH) / 2.0, 785- step, i)
+                step = step+20
             events = event.objects.filter(Conference=conference_id, Section_id=s.id)
             rep_dx = reports_time.objects.get(conference=conference_id)
             if (s.Type.TName == u"Пленарные"):
@@ -143,6 +142,8 @@ def create_pdf(request, conference_id):
             count = 0
             current_time = s.StartTime + timedelta(hours=6)
             for e in events:
+                print(s.id)
+                print(e.Report.RName)
                 pt = []
                 if (e.Report != None):
                     t = current_time + timedelta(minutes=dx)
@@ -153,12 +154,11 @@ def create_pdf(request, conference_id):
                     count = count + 1
                     for i in pt:
                         #text_width = i.__len__()*3
-                        p.drawString(40, 785-s.id*step - step_2, i)
-                        step_2=step_2+20
-                        if (785-s.id*step - step_2 < 100):
+                        p.drawString(40, 785-step, i)
+                        step = step+20
+                        if (785-step < 100):
                             p.showPage()
-                            step=17
-                            step_2 = 0
+                            step = 20
                             pdfmetrics.registerFont(MyFontObject)
                             p.setFont("Arial",12)
 
@@ -168,9 +168,8 @@ def create_pdf(request, conference_id):
             st.append(t.strftime('%H:%M') + " - " + t_end.strftime('%H:%M') + u" | " +  s.SName + " (" + s.Place + ")")
             for i in st:
                 #text_width = i.__len__()*3
-                p.drawString(40, 785-s.id*step - step_2, i)
-                step_2=step_2+20
-    step = step +15
+                p.drawString(40, 785-step , i)
+                step = step+20
 
 
     #elements = []
