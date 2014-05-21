@@ -105,13 +105,14 @@
 
         .time{
             list-style: none;
-
+            position: static;
             margin-right: 20px;
+            padding-top: 1px;
         }
 
         .timetext{
             font-size: 12px;
-            margin-top: -1px;
+            margin-top: -6px;
             position: absolute;
         }
 
@@ -202,4 +203,12 @@
         }
         .lnk-1:hover{
             color: lightgreen;
+        }
+
+        .start{
+            margin-top: 50px;
+        }
+
+        .dropped_section{
+            margin-top: -40px;
         }

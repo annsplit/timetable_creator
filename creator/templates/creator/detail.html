@@ -70,7 +70,12 @@
             placeholder: "ui-state-highlight",
             start: function(event, ui) {
                 var drag_id = ui.item.attr('id');
+                if (drag_id.indexOf("r") == -1){
+                    past_time = $(this).closest(".time");
+                    ui.item.data('past_time', past_time);
+                }
                 ui.item.data('drag_id', drag_id);
+
             },
             update: function(event, ui){
 
@@ -103,12 +108,18 @@
                         }
                 }
                 else {
+                        var past = ui.item.data('past_time');
+                        $(past).removeClass("start");
+                        $("#t_sec"+drag_id).empty();
+                        $("#"+drag_id).removeClass("dropped_section");
                         if (dest == "messageList"){
                         var time = "";
                         var date_source = "";
                     }
 
                     else{
+                        $(this).closest(".time").addClass("start");
+                        $("#"+drag_id).addClass("dropped_section");
                         var time=$(this).closest("div.time").find(".timetext").text();
 
                         var date_source=$('#'+drag_id).closest("div.time").closest("div.dayOfWeek").find(".dayHeader").val();
@@ -122,7 +133,7 @@
 
                             else
                                 sections_array[i] = "";
-
+                            $("#t_sec"+drag_id).prepend("(" + time+ ")")
                         }
 
                 }
@@ -273,6 +284,11 @@
     document.ready($(function(){
         for (var i=1; i<=Object.keys(sections_array).length+1; i++){
             v = i.toString();
+            if (sections_array[i] != ""){
+                $("#"+i).closest(".time").addClass("start");
+                $("#"+i).addClass("dropped_section");
+            }
+            //$("#"+i).( "<p>Test</p>" );
 
             $('#'+v).css("background-color", colors_array[i]);
             if (sections_width[i] > 0)
@@ -338,7 +354,7 @@
             {% if section.Type.TName == "Пленарные" and section.StartTime == None %}
                 <li class="resizablePlenary sid_class" id="{{ section.id }}">
                     <ul class="connectedSortable timegrid plenary" id="sec{{ section.id }}">
-                        {{ section.SName }}
+                        {{ section.SName }} <div style="display: inline-block" id="t_sec{{ section.id }}">({{ section.StartTime|date:"H:m" }})</div>
                         <br><i>{{ section.Person }}</i>
                         <br>
                         {% for report in message_list %}
@@ -359,7 +375,7 @@
             {% elif section.Type.TName == "Секционные" and section.StartTime == None%}
                  <li class="resizableSectional  sid_class" id="{{ section.id }}">
                      <ul class="connectedSortable timegrid sectional" id="sec{{ section.id }}">
-                         {{ section.SName }}
+                         {{ section.SName }}<div style="display: inline-block" id="t_sec{{ section.id }}">({{ section.StartTime|date:"H:m" }})</div>
                          <br><i>{{ section.Person }}</i>
                          <br>
                          {% for report in message_list %}
@@ -415,7 +431,7 @@
                             <li class="resizablePlenary sid_class" id="{{ section.id }}">
                                 <ul class="connectedSortable timegrid plenary" id="sec{{ section.id }}">
 
-                                    {{ section.SName }}
+                                    {{ section.SName }}<div style="display: inline-block" id="t_sec{{ section.id }}">({{ section.StartTime|date:"H:m" }})</div>
                                     <br><i>{{ section.Person }}</i>
 
                                     <br>
@@ -437,7 +453,7 @@
                             <li class="resizableSectional  sid_class" id="{{ section.id }}">
                                 <ul class="connectedSortable timegrid sectional" id="sec{{ section.id }}">
 
-                                    {{ section.SName }}
+                                    {{ section.SName }}<div style="display: inline-block" id="t_sec{{ section.id }}">({{ section.StartTime|date:"H:m" }})</div>
                                     <br><i>{{ section.Person }}</i>
 
                                     <br>
