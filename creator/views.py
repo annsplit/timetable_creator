@@ -86,6 +86,7 @@ def create_pdf(request, conference_id):
     from reportlab.rl_config import defaultPageSize
 
     PAGE_WIDTH = defaultPageSize[0]
+    PAGE_HEIGHT = defaultPageSize[1]
 
     MyFontObject = TTFont('Arial', 'creator/static/creator/arial.ttf')
     pdfmetrics.registerFont(MyFontObject)
@@ -95,12 +96,12 @@ def create_pdf(request, conference_id):
 
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="timetable.pdf"'
-    #wordWrap=True.
+    #wordWrap=True
     p = canvas.Canvas(response)
     p.setFont("Arial",12)
     cname_full = u"Расписание конференции " + '"' + cname + '"'
     header_text_width = cname_full.__len__()*3
-    sections = section.objects.filter(Conference=conference_id, StartTime__contains=":")
+    sections = section.objects.filter(Conference=conference_id, StartTime__contains=":").order_by('StartTime')
     day = formats.date_format(sections[0].StartTime, "DATE_FORMAT")
     print(day)
 
@@ -112,23 +113,65 @@ def create_pdf(request, conference_id):
     p.setFillColor(black)
     p.drawCentredString(int(PAGE_WIDTH) / 2.0, 785, day)
     step=17
+    step_2 = 15
+    t_format = '%H:%M'
     for s in sections:
-        step_2 = 10
+
         if (day != formats.date_format(s.StartTime, "DATE_FORMAT")):
             day = formats.date_format(s.StartTime, "DATE_FORMAT")
             p.setFillColor(lightgrey)
             p.rect(0, 780-s.id*step - step_2, int(PAGE_WIDTH),20,fill=1)
             p.setFillColor(black)
             p.drawCentredString(int(PAGE_WIDTH) / 2.0, 785-s.id*step - step_2, day)
-            step_2 = step_2+15
-        st = []
-        st.append(s.SName + " (" + s.Place + ")")
-        st.append(u"Председатель: " + s.Person)
+            step_2 = step_2+20
 
-        for i in st:
-            text_width = i.__len__()*3
-            p.drawCentredString(int(PAGE_WIDTH) / 2.0, 785-s.id*step - step_2, i)
-            step_2=step_2+15
+        st = []
+
+        if (s.Type.TName in [ u"Пленарные", u"Секционные" ]):
+            st.append(s.SName + " (" + s.Place + ")")
+            st.append(u"Председатель: " + s.Person)
+            for i in st:
+                text_width = i.__len__()*3
+                p.drawCentredString(int(PAGE_WIDTH) / 2.0, 785-s.id*step - step_2, i)
+                step_2=step_2+15
+            events = event.objects.filter(Conference=conference_id, Section_id=s.id)
+            rep_dx = reports_time.objects.get(conference=conference_id)
+            if (s.Type.TName == u"Пленарные"):
+                dx = rep_dx.plenary
+            else:
+                dx = rep_dx.sectional
+            count = 0
+            current_time = s.StartTime + timedelta(hours=6)
+            for e in events:
+                pt = []
+                if (e.Report != None):
+                    t = current_time + timedelta(minutes=dx)
+                    pt.append(current_time.strftime('%H:%M') + " - " + t.strftime('%H:%M') + u" | " + e.Report.RName)
+                    sponsor = u" (" + e.Report.Sponsor + u")"
+                    pt.append("                        " + e.Report.Reporter + sponsor)
+                    current_time = t
+                    count = count + 1
+                    for i in pt:
+                        #text_width = i.__len__()*3
+                        p.drawString(40, 785-s.id*step - step_2, i)
+                        step_2=step_2+20
+                        if (785-s.id*step - step_2 < 100):
+                            p.showPage()
+                            step=17
+                            step_2 = 0
+                            pdfmetrics.registerFont(MyFontObject)
+                            p.setFont("Arial",12)
+
+        else:
+            t = s.StartTime + timedelta(hours=6)
+            t_end = s.StartTime + timedelta(minutes=s.y_pos/2.0) + timedelta(hours=6)
+            st.append(t.strftime('%H:%M') + " - " + t_end.strftime('%H:%M') + u" | " +  s.SName + " (" + s.Place + ")")
+            for i in st:
+                #text_width = i.__len__()*3
+                p.drawString(40, 785-s.id*step - step_2, i)
+                step_2=step_2+20
+    step = step +15
+
 
     #elements = []
 
