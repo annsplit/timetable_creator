@@ -97,91 +97,94 @@ def create_pdf(request, conference_id):
     cname_full = u"Расписание конференции " + '"' + cname + '"'
     header_text_width = cname_full.__len__()*3
     sections = section.objects.filter(Conference=conference_id, StartTime__contains=":").order_by('StartTime')
-    day = formats.date_format(sections[0].StartTime, "DATE_FORMAT")
-    print(day)
+    if (sections):
+        day = formats.date_format(sections[0].StartTime, "DATE_FORMAT")
+        print(day)
 
-    #p.setStrokeColor(gray)
-    p.drawCentredString(int(PAGE_WIDTH) / 2.0, 820, cname_full)
-    #p.drawString((int(PAGE_WIDTH) - header_text_width) / 2.0 - header_text_width/2.0, 820, cname_full)
-    p.setFillColor(lightgrey)
-    p.rect(0, 780, int(PAGE_WIDTH),20,fill=1)
-    p.setFillColor(black)
-    p.drawCentredString(int(PAGE_WIDTH) / 2.0, 785, day)
-    step=20
-    t_format = '%H:%M'
-    for s in sections:
-        if (day != formats.date_format(s.StartTime, "DATE_FORMAT")):
-            if (785-step < 140):
-                p.showPage()
-                step = 20
-                pdfmetrics.registerFont(MyFontObject)
-                p.setFont("Arial",12)
-            day = formats.date_format(s.StartTime, "DATE_FORMAT")
-            p.setFillColor(lightgrey)
-            step = step+40
-            p.rect(0, 780-step, int(PAGE_WIDTH),20,fill=1)
-            p.setFillColor(black)
-            p.drawCentredString(int(PAGE_WIDTH) / 2.0, 785-step, day)
-            step = step+17
+        #p.setStrokeColor(gray)
+        p.drawCentredString(int(PAGE_WIDTH) / 2.0, 820, cname_full)
+        #p.drawString((int(PAGE_WIDTH) - header_text_width) / 2.0 - header_text_width/2.0, 820, cname_full)
+        p.setFillColor(lightgrey)
+        p.rect(0, 780, int(PAGE_WIDTH),20,fill=1)
+        p.setFillColor(black)
+        p.drawCentredString(int(PAGE_WIDTH) / 2.0, 785, day)
+        step=20
+        t_format = '%H:%M'
 
-        st = []
-
-        if (s.Type.TName in [ u"Пленарные", u"Секционные" ]):
-            if (785-step < 140):
-                p.showPage()
-                step = 20
-                pdfmetrics.registerFont(MyFontObject)
-                p.setFont("Arial",12)
-            st.append(s.SName + " (" + s.Place + ")")
-            st.append(u"Председатель: " + s.Person)
-            for i in st:
-                text_width = i.__len__()*3
-                p.drawCentredString(int(PAGE_WIDTH) / 2.0, 785- step, i)
+        for s in sections:
+            if (day != formats.date_format(s.StartTime, "DATE_FORMAT")):
+                if (785-step < 140):
+                    p.showPage()
+                    step = 20
+                    pdfmetrics.registerFont(MyFontObject)
+                    p.setFont("Arial",12)
+                day = formats.date_format(s.StartTime, "DATE_FORMAT")
+                p.setFillColor(lightgrey)
+                step = step+40
+                p.rect(0, 780-step, int(PAGE_WIDTH),20,fill=1)
+                p.setFillColor(black)
+                p.drawCentredString(int(PAGE_WIDTH) / 2.0, 785-step, day)
                 step = step+17
-            events = event.objects.filter(Conference=conference_id, Section_id=s.id)
-            rep_dx = reports_time.objects.get(conference=conference_id)
-            if (s.Type.TName == u"Пленарные"):
-                dx = rep_dx.plenary
+
+            st = []
+
+            if (s.Type.TName in [ u"Пленарные", u"Секционные" ]):
+                if (785-step < 140):
+                    p.showPage()
+                    step = 20
+                    pdfmetrics.registerFont(MyFontObject)
+                    p.setFont("Arial",12)
+                st.append(s.SName + " (" + s.Place + ")")
+                st.append(u"Председатель: " + s.Person)
+                for i in st:
+                    text_width = i.__len__()*3
+                    p.drawCentredString(int(PAGE_WIDTH) / 2.0, 785- step, i)
+                    step = step+17
+                events = event.objects.filter(Conference=conference_id, Section_id=s.id)
+                rep_dx = reports_time.objects.get(conference=conference_id)
+                if (s.Type.TName == u"Пленарные"):
+                    dx = rep_dx.plenary
+                else:
+                    dx = rep_dx.sectional
+                count = 0
+                current_time = s.StartTime + timedelta(hours=6)
+                for e in events:
+                    print(s.id)
+                    print(e.Report.RName)
+                    pt = []
+                    if (e.Report != None):
+                        if (e.y_pos == 0):
+                            t = current_time + timedelta(minutes=dx)
+                        else:
+                            t = current_time + timedelta(minutes=int(e.y_pos/2.0))
+                        pt.append(current_time.strftime('%H:%M') + " - " + t.strftime('%H:%M') + u" | " + e.Report.RName)
+                        sponsor = u" (" + e.Report.Sponsor + u")"
+                        pt.append("                        " + e.Report.Reporter + sponsor)
+                        current_time = t
+                        count = count + 1
+                        for i in pt:
+                            p.drawString(40, 785-step, i)
+                            step = step+17
+                        if (785-step < 100):
+                            p.showPage()
+                            step = 20
+                            pdfmetrics.registerFont(MyFontObject)
+                            p.setFont("Arial",12)
+
             else:
-                dx = rep_dx.sectional
-            count = 0
-            current_time = s.StartTime + timedelta(hours=6)
-            for e in events:
-                print(s.id)
-                print(e.Report.RName)
-                pt = []
-                if (e.Report != None):
-                    if (e.y_pos == 0):
-                        t = current_time + timedelta(minutes=dx)
-                    else:
-                        t = current_time + timedelta(minutes=int(e.y_pos/2.0))
-                    pt.append(current_time.strftime('%H:%M') + " - " + t.strftime('%H:%M') + u" | " + e.Report.RName)
-                    sponsor = u" (" + e.Report.Sponsor + u")"
-                    pt.append("                        " + e.Report.Reporter + sponsor)
-                    current_time = t
-                    count = count + 1
-                    for i in pt:
-                        p.drawString(40, 785-step, i)
-                        step = step+17
+                t = s.StartTime + timedelta(hours=6)
+                t_end = s.StartTime + timedelta(minutes=s.y_pos/2.0) + timedelta(hours=6)
+                st.append(t.strftime('%H:%M') + " - " + t_end.strftime('%H:%M') + u" | " +  s.SName + " (" + s.Place + ")")
+                for i in st:
+                    p.drawString(40, 785-step , i)
+                    step = step+17
                     if (785-step < 100):
                         p.showPage()
                         step = 20
                         pdfmetrics.registerFont(MyFontObject)
                         p.setFont("Arial",12)
-
-        else:
-            t = s.StartTime + timedelta(hours=6)
-            t_end = s.StartTime + timedelta(minutes=s.y_pos/2.0) + timedelta(hours=6)
-            st.append(t.strftime('%H:%M') + " - " + t_end.strftime('%H:%M') + u" | " +  s.SName + " (" + s.Place + ")")
-            for i in st:
-                p.drawString(40, 785-step , i)
-                step = step+17
-                if (785-step < 100):
-                    p.showPage()
-                    step = 20
-                    pdfmetrics.registerFont(MyFontObject)
-                    p.setFont("Arial",12)
-
+    else:
+        p.drawCentredString(int(PAGE_WIDTH) / 2.0, 785, "No sections are avaiable")
     p.showPage()
     p.save()
     return response
