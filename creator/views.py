@@ -355,6 +355,7 @@ def save(request):
                 newtime = datetime.strptime(times[t], param)
             my.StartTime = newtime
             my.save(update_fields=['StartTime'])
+            print(my.StartTime)
     return HttpResponse('Success')
 
 
@@ -440,7 +441,6 @@ def save_reports_order(request):
         if order:
             for o in order:
                 s_order = o[1].split("&")
-                print(s_order)
                 count = 1
                 for item in s_order:
                     r_id = item[4:]
@@ -448,7 +448,6 @@ def save_reports_order(request):
                         e = event.objects.get(Report=r_id)
                         e.order = count
                         e.save()
-                        print(e.order)
                         count = count + 1
     return HttpResponse('Success')
 

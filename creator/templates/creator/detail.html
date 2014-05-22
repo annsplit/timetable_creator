@@ -105,6 +105,7 @@
                     for (var i=1; i<Object.keys(reports_array).length+1; i++)
                         if (i == int_report_id ){
                             reports_array[i] = sid;
+                            alert(sid);
                         }
                 }
                 else {
@@ -254,7 +255,6 @@
             stop: function(){
                 var width = $(this).width();
                 var height = $(this).height();
-                alert(height);
                 var section_id=$(this).find("input[type=hidden]").val();
                 for (var i=1; i<=Object.keys(sections_array).length+1; i++)
                     if (i == section_id ){
@@ -356,7 +356,7 @@
             {% if section.Type.TName == "Пленарные" and section.StartTime == None %}
                 <li class="resizablePlenary sid_class" id="{{ section.id }}">
                     <ul class="connectedSortable timegrid plenary" id="sec{{ section.id }}">
-                        {{ section.SName }} <div style="display: inline-block" id="t_sec{{ section.id }}">({{ section.StartTime|date:"H:m" }})</div>
+                        {{ section.SName }} <div style="display: inline-block" id="t_sec{{ section.id }}">({{ section.StartTime|time:"H:i" }})</div>
                         <br><i>{{ section.Person }}</i>
                         <br>
                         {% for report in message_list %}
@@ -377,7 +377,7 @@
             {% elif section.Type.TName == "Секционные" and section.StartTime == None%}
                  <li class="resizableSectional  sid_class" id="{{ section.id }}">
                      <ul class="connectedSortable timegrid sectional" id="sec{{ section.id }}">
-                         {{ section.SName }}<div style="display: inline-block" id="t_sec{{ section.id }}">({{ section.StartTime|date:"H:m" }})</div>
+                         {{ section.SName }}<div style="display: inline-block" id="t_sec{{ section.id }}">({{ section.StartTime|time:"H:i" }})</div>
                          <br><i>{{ section.Person }}</i>
                          <br>
                          {% for report in message_list %}
@@ -433,7 +433,7 @@
                             <li class="resizablePlenary sid_class" id="{{ section.id }}">
                                 <ul class="connectedSortable timegrid plenary" id="sec{{ section.id }}">
 
-                                    {{ section.SName }}<div style="display: inline-block" id="t_sec{{ section.id }}">({{ section.StartTime|date:"H:m" }})</div>
+                                    {{ section.SName }}<div style="display: inline-block" id="t_sec{{ section.id }}">({{ section.StartTime|time:"H:i" }})</div>
                                     <br><i>{{ section.Person }}</i>
 
                                     <br>
@@ -455,7 +455,7 @@
                             <li class="resizableSectional  sid_class" id="{{ section.id }}">
                                 <ul class="connectedSortable timegrid sectional" id="sec{{ section.id }}">
 
-                                    {{ section.SName }}<div style="display: inline-block" id="t_sec{{ section.id }}">({{ section.StartTime|date:"H:m" }})</div>
+                                    {{ section.SName }}<div style="display: inline-block" id="t_sec{{ section.id }}">({{ section.StartTime|time:"H:i" }})</div>
                                     <br><i>{{ section.Person }}</i>
 
                                     <br>
