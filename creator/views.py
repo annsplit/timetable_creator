@@ -156,7 +156,7 @@ def create_pdf(request, conference_id):
                         if (e.y_pos == 0):
                             t = current_time + timedelta(minutes=dx)
                         else:
-                            t = current_time + timedelta(minutes=int(e.y_pos/2.0))
+                            t = current_time + timedelta(minutes=int(e.y_pos/2.75))
                         pt.append(current_time.strftime('%H:%M') + " - " + t.strftime('%H:%M') + u" | " + e.Report.RName)
                         sponsor = u" (" + e.Report.Sponsor + u")"
                         pt.append("                        " + e.Report.Reporter + sponsor)

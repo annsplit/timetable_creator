@@ -28,12 +28,12 @@
     var sec_time_def = {};
     var section_types = {};
     {% for t in types_list %}
-        sec_time_def[{{ t.id }}] = 2 * {{ t.time_default }};
+        sec_time_def[{{ t.id }}] = 2.75 * {{ t.time_default }};
     {% endfor %}
     rep_p = {{ reports_time_list.plenary }};
-    rep_p *=2;
+    rep_p *=2.75;
     rep_s = {{ reports_time_list.sectional }};
-    rep_s *=2;
+    rep_s *=2.75;
     {% for section in section_list %}
         {%  if section.StartTime == None %}
             sections_array[{{section.id}}] = "";
@@ -253,6 +253,7 @@
             stop: function(){
                 var width = $(this).width();
                 var height = $(this).height();
+                alert(height);
                 var section_id=$(this).find("input[type=hidden]").val();
                 for (var i=1; i<=Object.keys(sections_array).length+1; i++)
                     if (i == section_id ){
