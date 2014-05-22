@@ -176,7 +176,7 @@ def create_pdf(request, conference_id):
 
             else:
                 t = s.StartTime + timedelta(hours=6)
-                t_end = s.StartTime + timedelta(minutes=s.y_pos/2.0) + timedelta(hours=6)
+                t_end = s.StartTime + timedelta(minutes=round_to_5(s.y_pos/2.75)) + timedelta(hours=6)
                 st.append(t.strftime('%H:%M') + " - " + t_end.strftime('%H:%M') + u" | " +  s.SName + " (" + s.Place + ")")
                 for i in st:
                     p.drawString(40, 785-step , i)
@@ -355,7 +355,6 @@ def save(request):
                 newtime = datetime.strptime(times[t], param)
             my.StartTime = newtime
             my.save(update_fields=['StartTime'])
-            print(my.StartTime)
     return HttpResponse('Success')
 
 
@@ -444,7 +443,7 @@ def save_reports_order(request):
                 count = 1
                 for item in s_order:
                     r_id = item[4:]
-                    if not "sec" in r_id:
+                    if not ("sec" in r_id) and ("object" in r_id):
                         e = event.objects.get(Report=r_id)
                         e.order = count
                         e.save()

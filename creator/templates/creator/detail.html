@@ -42,6 +42,11 @@
         {% endif %}
 
         section_types[{{ section.id }}] = {{ section.Type_id }};
+        {% if section.Type.TName == "Пленарные" %}
+            plenary_id = {{ section.Type_id }}
+        {% elif section.Type.TName == "Секционные"%}
+            sectional_id= {{ section.Type_id }}
+        {% endif %}
         sections_width[{{ section.id }}] = {{ section.x_pos }};
         sections_height[{{ section.id }}] = {{ section.y_pos }};
     {% endfor %}
@@ -89,14 +94,12 @@
                     report_id = report_id.replace("r_","");
                     int_report_id = +report_id;
                     if (c.indexOf("resizablePlenary") > -1){
-                        new_height = rep_p;
-                        $('#'+drag_id).css("height", new_height);
-                        reports_height[int_report_id] = new_height;
+                        $('#'+drag_id).css("height", rep_p);
+                        reports_height[int_report_id] = rep_p;
                     }
                     if (c.indexOf("resizableSectional") > -1){
-                        new_height = rep_s;
-                        $('#'+drag_id).css("height", new_height);
-                        reports_height[int_report_id] = new_height;
+                        $('#'+drag_id).css("height", rep_s);
+                        reports_height[int_report_id] = rep_s;
                     }
                     if (sid[0] == "m"){
                         sid = 0;
@@ -105,22 +108,23 @@
                     for (var i=1; i<Object.keys(reports_array).length+1; i++)
                         if (i == int_report_id ){
                             reports_array[i] = sid;
-                            alert(sid);
                         }
                 }
                 else {
-                        var past = ui.item.data('past_time');
-                        $(past).removeClass("start");
-                        $("#t_sec"+drag_id).empty();
-                        $("#"+drag_id).removeClass("dropped_section");
-                        if (dest == "messageList"){
+                    var past = ui.item.data('past_time');
+                    $(past).removeClass("start");
+                    $("#t_sec"+drag_id).empty();
+                    $("#"+drag_id).removeClass("dropped_section");
+                    if (dest == "messageList"){
                         var time = "";
                         var date_source = "";
                     }
 
                     else{
-                        $(this).closest(".time").addClass("start");
-                        $("#"+drag_id).addClass("dropped_section");
+                        if (section_types[drag_id] == plenary_id  || section_types[drag_id] == sectional_id){
+                            $(this).closest(".time").addClass("start");
+                            $("#"+drag_id).addClass("dropped_section");
+                        }
                         var time=$(this).closest("div.time").find(".timetext").text();
 
                         var date_source=$('#'+drag_id).closest("div.time").closest("div.dayOfWeek").find(".dayHeader").val();
@@ -144,88 +148,99 @@
 
     function saveTimetable(){
 
-        for (var i=0; i<7; i++){
-            if (i==0)
-                $.ajax({
+        //for (var i=0; i<7; i++){
+          //  if (i==0)
+            $.ajax({
                 type: 'POST',
                 traditional: true,
                 data: sections_array,
                 url: '/timetables/save/',
                 success: function() {
-                    alert("Временная сетка (положения) успешно сохранена");
+                    setTimeout(saveWidth, 4000);
                 },
                 error: function() {
                     alert("Ошибка при сохранении положений");
                 }
             });
-            if (i==1)
+    }
+            //if (i==1)
+            function saveWidth(){
                 $.ajax({
                 type: 'POST',
                 traditional: true,
                 data: sections_width,
                 url: '/timetables/save_width/',
                 success: function() {
-                    alert("Временная сетка (ширина) успешно сохранена");
+                    setTimeout(saveHeight, 4000);
                 },
                 error: function() {
                     alert("Ошибка при сохранении ширины");
                 }
             });
-            if (i==2)
+            }
+            //if (i==2)
+            function saveHeight(){
                 $.ajax({
                 type: 'POST',
                 traditional: true,
                 data: sections_height,
                 url: '/timetables/save_height/',
                 success: function() {
-                    alert("Временная сетка (высота) успешно сохранена");
+                    setTimeout(saveReports, 4000);
                 },
                 error: function() {
                     alert("Ошибка при сохранении высоты");
                 }
             });
+            }
 
-            if (i==3){
+            //if (i==3){
+            function saveReports(){
                 $.ajax({
                 type: 'POST',
                 traditional: true,
                 data: reports_array,
                 url: '/timetables/save_reports/',
                 success: function() {
-                    alert("Временная сетка (доклады) успешно сохранена");
+                    setTimeout(saveRWidth, 4000);
                 },
                 error: function() {
                     alert("Ошибка при сохранении докладов");
                 }
             });
             }
-            if (i==4)
+            //if (i==4)
+            function saveRWidth(){
                 $.ajax({
                 type: 'POST',
                 traditional: true,
                 data: reports_width,
                 url: '/timetables/save_reports_width/',
                 success: function() {
-                    alert("Временная сетка (доклады ширина) успешно сохранена");
+                    setTimeout(saveRHeight, 4000);
                 },
                 error: function() {
                     alert("Ошибка при сохранении докладов ширина");
                 }
             });
-            if (i==5)
+            }
+            //if (i==5)
+            function saveRHeight(){
                 $.ajax({
                 type: 'POST',
                 traditional: true,
                 data: reports_height,
                 url: '/timetables/save_reports_height/',
                 success: function() {
-                    alert("Временная сетка (доклады высота) успешно сохранена");
+                    setTimeout(saveOrder, 4000);
                 },
                 error: function() {
                     alert("Ошибка при сохранении докладов высота");
                 }
             });
-            if (i==6){
+            }
+            //if (i==6){
+            function saveOrder(){
                 var reports_order = {};
                 {%  for s in section_list %}
                     reports_order[{{ s.id }}] = $("#sec" + {{ s.id }}).sortable('serialize');
@@ -236,7 +251,7 @@
                     data: reports_order,
                     url: '/timetables/save_reports_order/',
                     success: function() {
-                        alert("Временная сетка (доклады порядок) успешно сохранена");
+                        alert("Временная сетка успешно сохранена");
                     },
                     error: function() {
                         alert("Ошибка при сохранении докладов порядок");
@@ -244,14 +259,14 @@
                 });
             }
 
-        }
+        //}
 
-    }
+
 
     jQuery(function() {
         jQuery(" .resizablePlenary, .resizableSectional, .resizableSimple").resizable({
             minWidth: "300",
-            minHeight: "100",
+            minHeight: "27",
             stop: function(){
                 var width = $(this).width();
                 var height = $(this).height();
@@ -286,7 +301,7 @@
     document.ready($(function(){
         for (var i=1; i<=Object.keys(sections_array).length+1; i++){
             v = i.toString();
-            if (sections_array[i] != ""){
+            if (sections_array[i] != "" && (section_types[i] == plenary_id  || section_types[i] == sectional_id)){
                 $("#"+i).closest(".time").addClass("start");
                 $("#"+i).addClass("dropped_section");
             }
@@ -309,6 +324,7 @@
                 $('#r_'+v).css("height", reports_height[i]);
 
         }
+
     })
     );
 
