@@ -83,6 +83,9 @@ def create_pdf(request, conference_id):
     PAGE_WIDTH = defaultPageSize[0]
     PAGE_HEIGHT = defaultPageSize[1]
 
+    def round_to_5(x, base=5):
+        return int(base * round(float(x)/base))
+
     MyFontObject = TTFont('Arial', 'creator/static/creator/arial.ttf')
     pdfmetrics.registerFont(MyFontObject)
 
@@ -140,7 +143,7 @@ def create_pdf(request, conference_id):
                     text_width = i.__len__()*3
                     p.drawCentredString(int(PAGE_WIDTH) / 2.0, 785- step, i)
                     step = step+17
-                events = event.objects.filter(Conference=conference_id, Section_id=s.id)
+                events = event.objects.filter(Conference=conference_id, Section_id=s.id).order_by('Section','order')
                 rep_dx = reports_time.objects.get(conference=conference_id)
                 if (s.Type.TName == u"Пленарные"):
                     dx = rep_dx.plenary
@@ -149,14 +152,14 @@ def create_pdf(request, conference_id):
                 count = 0
                 current_time = s.StartTime + timedelta(hours=6)
                 for e in events:
-                    print(s.id)
+                    #print(s.id)
                     print(e.Report.RName)
                     pt = []
                     if (e.Report != None):
-                        if (e.y_pos == 0):
+                        if (e.y_pos == 0.0):
                             t = current_time + timedelta(minutes=dx)
                         else:
-                            t = current_time + timedelta(minutes=int(e.y_pos/2.75))
+                            t = current_time + timedelta(minutes=round_to_5(e.y_pos/2.75))
                         pt.append(current_time.strftime('%H:%M') + " - " + t.strftime('%H:%M') + u" | " + e.Report.RName)
                         sponsor = u" (" + e.Report.Sponsor + u")"
                         pt.append("                        " + e.Report.Reporter + sponsor)
@@ -437,14 +440,16 @@ def save_reports_order(request):
         if order:
             for o in order:
                 s_order = o[1].split("&")
+                print(s_order)
                 count = 1
                 for item in s_order:
                     r_id = item[4:]
-                    e = event.objects.get(Report=r_id)
-                    e.order = count
-                    e.save()
-                    print(e.order)
-                    count = count + 1
+                    if not "sec" in r_id:
+                        e = event.objects.get(Report=r_id)
+                        e.order = count
+                        e.save()
+                        print(e.order)
+                        count = count + 1
     return HttpResponse('Success')
 
 
