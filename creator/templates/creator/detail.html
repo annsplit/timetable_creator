@@ -254,7 +254,7 @@
                         alert("Временная сетка успешно сохранена");
                     },
                     error: function() {
-                        alert("Ошибка при сохранении докладов порядок");
+                        alert("Ошибка при сохранении");
                     }
                 });
             }
@@ -348,6 +348,7 @@
 {%  if usr %}
 <input onclick="saveTimetable();" type=button id="submit" value="Сохранить временную сетку">
 <button onclick="window.location='/timetables/pdf/{{ conference_name.id }}';">Создать PDF-файл сохранённого расписания</button>
+<button onclick="window.location='/timetables/generate/{{ conference_name.id }}';">Генерация первоначального варианта</button>
 <br>
 
 <div id="messagesBox" class="sid_class">

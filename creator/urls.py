@@ -7,6 +7,7 @@ urlpatterns = patterns('',
     # ex: /polls/
     url(r'^$', views.index, name='index'),
     url(r'^(?P<conference_id>[0-9]+)/$', views.detail, name='detail'),
+    url(r'^generate/(?P<conference_id>[0-9]+)/$', views.generate_first, name='generate_first'),
     url(r'^pdf/(?P<conference_id>[0-9]+)/$', views.create_pdf, name='create_pdf'),
     url(r'^save/$', views.save, name='save'),
     url(r'^edit/(?P<conference_id>[0-9]+)/$', views.edit_report, name='edit'),

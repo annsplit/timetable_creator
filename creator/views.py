@@ -138,7 +138,8 @@ def create_pdf(request, conference_id):
                     pdfmetrics.registerFont(MyFontObject)
                     p.setFont("Arial",12)
                 st.append(s.SName + " (" + s.Place + ")")
-                st.append(u"Председатель: " + s.Person)
+                if s.Person is not None:
+                    st.append(u"Председатель: " + s.Person)
                 for i in st:
                     text_width = i.__len__()*3
                     p.drawCentredString(int(PAGE_WIDTH) / 2.0, 785- step, i)
@@ -176,7 +177,10 @@ def create_pdf(request, conference_id):
 
             else:
                 t = s.StartTime + timedelta(hours=6)
-                t_end = s.StartTime + timedelta(minutes=round_to_5(s.y_pos/2.75)) + timedelta(hours=6)
+                if s.y_pos==0:
+                    t_end = s.StartTime + timedelta(minutes=s.Type.time_default) + timedelta(hours=6)
+                else:
+                    t_end = s.StartTime + timedelta(minutes=round_to_5(s.y_pos/2.75)) + timedelta(hours=6)
                 st.append(t.strftime('%H:%M') + " - " + t_end.strftime('%H:%M') + u" | " +  s.SName + " (" + s.Place + ")")
                 for i in st:
                     p.drawString(40, 785-step , i)
@@ -320,9 +324,9 @@ def detail(request, conference_id):
 
 
     #form = LoginForm()
-    r = report.objects.get(id=1)
-    form = ReportForm(instance=r)
-    formset = ReportFormset(initial=report)
+    #r = report.objects.get(id=1)
+    #form = ReportForm(instance=r)
+    #formset = ReportFormset(initial=report)
     reports_time_list = reports_time.objects.get(conference=conference_id)
     usr = True
     if (str(request.user) == "AnonymousUser"):
@@ -330,8 +334,8 @@ def detail(request, conference_id):
     context = {'message_list': message_list,
                'conference_name': conference_name,
                'date_list': date_list,
-               'form': form,
-               'formset':formset,
+               #'form': form,
+               #'formset':formset,
                'section_list': section_list,
                'time_list': time_list,
                'types_list': types_list,
@@ -340,6 +344,64 @@ def detail(request, conference_id):
     }
     #return render(request, 'creator/detail.html', context)
     return render(request, 'creator/detail.html', context)
+
+
+def generate_first(request, conference_id):
+    conf = conference.objects.get(pk=conference_id)
+    section.objects.filter(Conference=conf).delete()
+    rt = reports_time.objects.get(conference=conf)
+    rt.plenary = 25
+    rt.sectional = 20
+    rt.save()
+    section_type.objects.filter(Conference=conf).delete()
+
+    section_type.objects.create(TName=u"Организационные мероприятия", color="white", time_default=30, Conference=conf)
+    section_type.objects.create(TName=u"Обеды и кофе-брейки", color="ghostwhite", time_default=30, Conference=conf)
+    section_type.objects.create(TName=u"Секционные", color="#CEF6D8", time_default=117, Conference=conf)
+    section_type.objects.create(TName=u"Пленарные", color="mediumpurple", time_default=141, Conference=conf)
+    section_type.objects.create(TName=u"Стендовые", color="58ACFA", time_default=60, Conference=conf)
+
+    events_list = event.objects.filter(Conference=conf)
+    for e in events_list:
+        e.Section = None
+
+    diff = conf.EndDate - conf.StartDate
+    day = conf.StartDate
+
+    for i in range(0, diff.days+1):
+        section.objects.create(SName=u"Обед", Conference=conf, Place=u"Столовая", Type=section_type.objects.get(TName=u"Обеды и кофе-брейки"), StartTime=datetime.combine(day,time(14,0)))
+        section.objects.create(SName=u"Кофе-брейк", Conference=conf, Place=u"Столовая", Type=section_type.objects.get(TName=u"Обеды и кофе-брейки"), StartTime=datetime.combine(day,time(17,0)))
+        if i in range(1, diff.days):
+            section.objects.create(SName=u"Пленарные доклады", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Пленарные"), StartTime=datetime.combine(day,time(11,0)))
+            section.objects.create(SName=u"Секционные доклады", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Секционные"), StartTime=datetime.combine(day,time(15,0)))
+            section.objects.create(SName=u"Секционные доклады", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Секционные"), StartTime=datetime.combine(day,time(15,0)))
+        elif i==0:
+            section.objects.create(SName=u"Торжественное открытие", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Организационные мероприятия"), StartTime=datetime.combine(day,time(10,0)))
+            section.objects.create(SName=u"Регистрация участников", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Организационные мероприятия"), StartTime=datetime.combine(day,time(11,0)))
+        else:
+            section.objects.create(SName=u"Секция стендовых докладов", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Стендовые"), StartTime=datetime.combine(day,time(16,0)))
+            section.objects.create(SName=u"Торжественное закрытие конференции", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Организационные мероприятия"), StartTime=datetime.combine(day,time(18,0)))
+            section.objects.create(SName=u"Фотографирование", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Организационные мероприятия"), StartTime=datetime.combine(day,time(19,0)))
+        day = day + timedelta(days=1)
+
+    section_list = section.objects.filter(Conference=conf)
+    for s in section_list:
+        if s.Type.TName in [u"Пленарные", u"Секционные"]:
+            for i in range(1,6):
+                e = event.objects.filter(Conference=conf, Section=None).last()
+                print(e.Report)
+                if e is not None:
+                    e.Section = s
+                else:
+                    e = event.objects.create(Section=s, Conference=conf)
+                if s.Type.TName == u"Пленарные":
+                    e.y_pos = 2.75*rt.plenary
+                else:
+                    e.y_pos = 2.75*rt.sectional
+                e.save()
+
+    return detail(request, conference_id)
+
 
 @login_required
 @csrf_exempt
@@ -625,7 +687,7 @@ def data_get(request):
         header = []
         rownum = 0
         a_set =['id', 'title', 'xfield001', 'xfield008', 'xfield016', 'xfield005', 'authors']
-        conference_name = get_object_or_404(conference, pk=1)
+        conference_name = get_object_or_404(conference, pk=int(cid))
         for row in reader_r:
             if rownum == 0:
                 header = row

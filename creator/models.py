@@ -79,7 +79,7 @@ class event(models.Model):
     order = models.IntegerField(default=0)
     x_pos = models.FloatField(default=0)
     y_pos = models.FloatField(default=0)
-    Section = models.ForeignKey(section, null=True, blank=True)
+    Section = models.ForeignKey(section, null=True, blank=True, on_delete=models.SET_NULL)
     Report = models.OneToOneField(report, null=True, blank=True,on_delete=models.SET_NULL)
     Conference = models.ForeignKey(conference)
     def __unicode__(self):  # Python 3: def __str__(self):

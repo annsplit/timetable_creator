@@ -125,7 +125,7 @@
 
         .resizablePlenary{
             background-color: mediumpurple;
-            width: 500px;
+            width: 1135px;
             float: left;
             position: relative;
 
@@ -134,7 +134,7 @@
 
         .resizableSectional{
             background-color: greenyellow;
-            width: 500px;
+            width: 310px;
             position: relative;
             float: left;
 
@@ -143,7 +143,7 @@
 
         .resizableSimple{
             background-color: ghostwhite;
-            width: 500px;
+            width: 1135px;
             position: relative;
             float: left;
 
