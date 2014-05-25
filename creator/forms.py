@@ -1,7 +1,10 @@
 __author__ = 'annsplit'
+# -*- coding: utf-8 -*-
+
 from django import forms
 from models import report, section_type, reports_time
 from django.forms.models import modelformset_factory
+from django.utils.translation import ugettext_lazy as _
 
 class ReportForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
@@ -13,7 +16,12 @@ class ReportForm(forms.ModelForm):
 
     class Meta:
         model = report
-        fields = ["RName", "Reporter", "Topic"]
+        fields = ("RName", "Reporter", "Topic")
+        labels = {
+            "RName": _(u"Название доклада"),
+            "Reporter": _(u"Докладчик"),
+            "Topic": _(u"Тематика")
+        }
 
 class TypeForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
@@ -23,7 +31,11 @@ class TypeForm(forms.ModelForm):
 
     class Meta:
         model = section_type
-        fields = ["TName", "time_default"]
+        fields = ("TName", "time_default")
+        labels = {
+            "TName": _(u"Тип секции"),
+            "time_default": _(u"Продолжительность по умолчанию")
+        }
 #PostFormSet = modelformset_factory(Post, form=PostForm)
 
 
@@ -34,7 +46,11 @@ class RepTimeForm(forms.ModelForm):
         self.fields['sectional'].widget.attrs['class'] = 'reportForm'
     class Meta:
         model = reports_time
-        fields = ["plenary", "sectional"]
+        fields = ("plenary", "sectional")
+        labels = {
+            "plenary": _(u"Пленарные доклады"),
+            "sectional": _(u"Секционные доклады")
+        }
 
 ReportFormset = modelformset_factory(report, form=ReportForm, extra=0)
 TypeFormset = modelformset_factory(section_type, form=TypeForm, extra=0)

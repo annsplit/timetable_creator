@@ -17,7 +17,7 @@ class conference(models.Model):
     DayEnd = models.TimeField()
     RepTime = models.OneToOneField(reports_time)
     def __unicode__(self):  # Python 3: def __str__(self):
-        return self.CName
+        return u"%s" % self.CName
 
 
 class section_type(models.Model):
@@ -38,7 +38,7 @@ class section_type(models.Model):
     time_default = models.IntegerField()
     Conference = models.ForeignKey(conference)
     def __unicode__(self):  # Python 3: def __str__(self):
-        return self.TName
+        return  u"%s" % self.TName
 
 
 
@@ -55,7 +55,9 @@ class section(models.Model):
     x_pos = models.FloatField(default=0)
     y_pos = models.FloatField(default=0)
     def __unicode__(self):  # Python 3: def __str__(self):
-        return self.SName
+        from datetime import datetime
+        param = "%Y-%m-%d %H:%M"
+        return u"%s, %s" % (self.SName, datetime.strftime(self.StartTime, param))
 
 
 class report(models.Model):
