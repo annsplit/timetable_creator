@@ -7,6 +7,7 @@ from creator.models import report, conference, section, section_type, event, rep
 
 class report_admin(admin.ModelAdmin):
     fieldsets = [
+        ('RID',               {'fields': ['rid']}),
         ('Conference',               {'fields': ['Conference']}),
         ('Name',               {'fields': ['RName']}),
         ('Annotation',   {'fields': ['Annotation']}),

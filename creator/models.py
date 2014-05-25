@@ -72,7 +72,7 @@ class report(models.Model):
     Conference = models.ForeignKey(conference)
 
     def __unicode__(self):  # Python 3: def __str__(self):
-        return self.RName
+        return u"%s" % self.RName
 
 
 class event(models.Model):
@@ -83,6 +83,6 @@ class event(models.Model):
     Report = models.OneToOneField(report, null=True, blank=True,on_delete=models.SET_NULL)
     Conference = models.ForeignKey(conference)
     def __unicode__(self):  # Python 3: def __str__(self):
-        return self.Report
+        return u"%s" % self.Report
 
 
