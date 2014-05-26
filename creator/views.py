@@ -165,7 +165,7 @@ def create_pdf(request, conference_id):
                             t = current_time + timedelta(minutes=round_to_5(e.y_pos/2.75))
                         pt.append(current_time.strftime('%H:%M') + " - " + t.strftime('%H:%M') + u" | " + e.Report.RName)
                         sponsor = u" (" + e.Report.Sponsor + u")"
-                        pt.append("                        " + e.Report.Reporter + sponsor)
+                        pt.append("                        " + e.Report.Author + sponsor)
                         current_time = t
                         t = t + timedelta(minutes=q_dx)
                         pt.append(current_time.strftime('%H:%M') + " - " + t.strftime('%H:%M') + u" | " + u"Ответы на вопросы и обсуждение")
@@ -766,6 +766,9 @@ def data_get(request, conference_id):
                         reporter = col
                     elif header[colnum] == 'xfield016':
                         topic = col
+                        if author == "":
+                            reporter_split = reporter.split(u" ")
+                            author = reporter_split[1][0] + u"." + reporter_split[2][0] + u". " + reporter_split[0]
                         if report.objects.filter(rid=int(rid), Conference=conference_name).count() == 0:
                             rep = report(rid=int(rid), RName=title, Annotation=ann, Reporter=reporter, Topic=topic, Session=session, Organisation=organisation, Author=author, Sponsor=sponsor, IsFinal=final, Conference=conference_name )
                             rep.save()
@@ -786,7 +789,6 @@ def data_get(request, conference_id):
                                     sponsor = organisation
                                 else:
                                     sponsor = ""
-                        print(authors_ids)
                     elif header[colnum] == 'confirm':
                         final = col
 
