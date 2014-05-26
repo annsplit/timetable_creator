@@ -20,7 +20,10 @@ class report_admin(admin.ModelAdmin):
         (u'Спорсор',                            {'fields': ['Sponsor']}),
         (u'Получена финальная версия статьи',   {'fields': ['IsFinal']}),
     ]
-    list_display = ('RName', 'Conference', 'Reporter', 'Sponsor', 'Session')
+    list_display = ('RName', 'Conference', 'Topic', 'Author', 'Sponsor', 'Session')
+    list_filter = ['Conference', 'Topic', 'Session', 'Sponsor', 'IsFinal']
+    ordering = ['-Conference', 'Topic', 'Session', 'RName']
+    search_fields = ['RName', 'Annotation', 'Author', 'Sponsor', 'Reporter', 'Organisation']
 
 
 class conference_admin(admin.ModelAdmin):
@@ -56,7 +59,10 @@ class section_admin(admin.ModelAdmin):
         (u'Ширина блока в расписании (0 - по умолчанию типа секции)',   {'fields': ['x_pos']}),
         (u'Высота блока в расписании (0 - по умолчанию типа секции)',   {'fields': ['y_pos']}),
     ]
-    list_display = ('SName', 'Person', 'StartTime', 'Place', 'Conference')
+    list_display = ('StartTime', 'SName', 'Person', 'Place', 'Conference')
+    list_display_links = ['SName']
+    list_filter = ('Conference', 'Type')
+    ordering = ['-Conference', 'StartTime', 'SName']
 
 
 class section_type_admin(admin.ModelAdmin):
@@ -67,7 +73,9 @@ class section_type_admin(admin.ModelAdmin):
         (u'Конференция',                    {'fields': ['Conference']})
 
     ]
-    list_display = ('TName', 'color')
+    list_display = ('TName', 'color', 'Conference')
+    list_filter = ('Conference', 'TName', 'color')
+    ordering = ['-Conference', 'TName']
 
 
 class event_admin(admin.ModelAdmin):
@@ -80,6 +88,8 @@ class event_admin(admin.ModelAdmin):
         (u'Связанный доклад',                               {'fields': ['Report']})
     ]
     list_display = ('Report', 'Conference', 'Section', 'order')
+    list_filter = ['Conference']
+    ordering = ['-Conference', 'Report__RName']
 
 
 admin.site.register(report, report_admin)
