@@ -3,19 +3,21 @@ from django import forms
 
 # Create your models here.
 
-class reports_time(models.Model):
-    plenary = models.IntegerField()
-    sectional = models.IntegerField()
-
-
-
 class conference(models.Model):
     CName = models.CharField(max_length=200)
     StartDate = models.DateField()
     EndDate = models.DateField()
-    DayStart = models.TimeField()
-    DayEnd = models.TimeField()
-    RepTime = models.OneToOneField(reports_time)
+    DayStart = models.TimeField(default="9:00")
+    DayEnd = models.TimeField(default="20:00")
+    plenary = models.IntegerField(default=25)
+    p_questions = models.IntegerField(default=5)
+    sectional = models.IntegerField(default=15)
+    s_questions = models.IntegerField(default=5)
+    database = models.CharField(max_length=200, default="agora")
+    authors_table = models.CharField(max_length=200)
+    reports_table = models.CharField(max_length=200)
+    login = models.CharField(max_length=200)
+    password = models.CharField(max_length=200)
     def __unicode__(self):  # Python 3: def __str__(self):
         return u"%s" % self.CName
 
@@ -50,7 +52,6 @@ class section(models.Model):
     Conference = models.ForeignKey(conference)
     Place = models.CharField(max_length=200)
     Type = models.ForeignKey(section_type)
-    #TimeCount = models.ForeignKey(time)
     StartTime = models.DateTimeField(blank=True, null=True)
     x_pos = models.FloatField(default=0)
     y_pos = models.FloatField(default=0)

@@ -2,7 +2,7 @@ __author__ = 'annsplit'
 # -*- coding: utf-8 -*-
 
 from django import forms
-from models import report, section_type, reports_time
+from models import report, section_type, conference
 from django.forms.models import modelformset_factory
 from django.utils.translation import ugettext_lazy as _
 
@@ -43,13 +43,17 @@ class RepTimeForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(RepTimeForm, self).__init__(*args, **kwargs)
         self.fields['plenary'].widget.attrs['class'] = 'reportForm'
+        self.fields['p_questions'].widget.attrs['class'] = 'reportForm'
         self.fields['sectional'].widget.attrs['class'] = 'reportForm'
+        self.fields['s_questions'].widget.attrs['class'] = 'reportForm'
     class Meta:
-        model = reports_time
-        fields = ("plenary", "sectional")
+        model = conference
+        fields = ("plenary", "p_questions", "sectional", "s_questions")
         labels = {
             "plenary": _(u"Пленарные доклады"),
-            "sectional": _(u"Секционные доклады")
+            "p_questions": _(u"Вопросы к пленарным докладам"),
+            "sectional": _(u"Секционные доклады"),
+            "s_questions": _(u"Вопросы к секционным докладам")
         }
 
 ReportFormset = modelformset_factory(report, form=ReportForm, extra=0)

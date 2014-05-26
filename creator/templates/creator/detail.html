@@ -156,7 +156,8 @@
                 data: sections_array,
                 url: '/timetables/save/',
                 success: function() {
-                    setTimeout(saveWidth, 4000);
+                    //setTimeout(saveWidth, 4000);
+                    saveWidth();
                 },
                 error: function() {
                     alert("Ошибка при сохранении положений");
@@ -171,7 +172,8 @@
                 data: sections_width,
                 url: '/timetables/save_width/',
                 success: function() {
-                    setTimeout(saveHeight, 4000);
+                    //setTimeout(saveHeight, 4000);
+                    saveHeight();
                 },
                 error: function() {
                     alert("Ошибка при сохранении ширины");
@@ -186,7 +188,8 @@
                 data: sections_height,
                 url: '/timetables/save_height/',
                 success: function() {
-                    setTimeout(saveReports, 4000);
+                    //setTimeout(saveReports, 4000);
+                    saveReports();
                 },
                 error: function() {
                     alert("Ошибка при сохранении высоты");
@@ -202,7 +205,8 @@
                 data: reports_array,
                 url: '/timetables/save_reports/',
                 success: function() {
-                    setTimeout(saveRWidth, 4000);
+                    //setTimeout(saveRWidth, 4000);
+                    saveRWidth();
                 },
                 error: function() {
                     alert("Ошибка при сохранении докладов");
@@ -217,7 +221,8 @@
                 data: reports_width,
                 url: '/timetables/save_reports_width/',
                 success: function() {
-                    setTimeout(saveRHeight, 4000);
+                    //setTimeout(saveRHeight, 4000);
+                    saveRHeight();
                 },
                 error: function() {
                     alert("Ошибка при сохранении докладов ширина");
@@ -232,7 +237,8 @@
                 data: reports_height,
                 url: '/timetables/save_reports_height/',
                 success: function() {
-                    setTimeout(saveOrder, 4000);
+                    //setTimeout(saveOrder, 4000);
+                    saveOrder();
                 },
                 error: function() {
                     alert("Ошибка при сохранении докладов высота");
@@ -347,8 +353,9 @@
 <a style="margin-left: 20px" class="lnk" href="/timetables/">Вернуться к списку конференций</a><br>
 {%  if usr %}
 <input onclick="saveTimetable();" type=button id="submit" value="Сохранить временную сетку">
-<button onclick="window.location='/timetables/pdf/{{ conference_name.id }}';">Создать PDF-файл сохранённого расписания</button>
-<button onclick="window.location='/timetables/generate/{{ conference_name.id }}';">Генерация первоначального варианта</button>
+<button onclick="window.location='/timetables/pdf/{{ conference_name.id }}';">Создать PDF-файл сохранённого расписания</button><br><br>
+<button style="color: orangered;margin-left: 20px" onclick="window.location='/timetables/generate/{{ conference_name.id }}';">Генерация первоначального варианта</button>
+<p style="margin-left: 20px; color: orangered">ВНИМАНИЕ: При этом все имеющиеся секции, типы секций и продолжительности будут заменены новыми</p>
 <br>
 
 <div id="messagesBox" class="sid_class">

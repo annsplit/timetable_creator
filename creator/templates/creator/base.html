@@ -11,6 +11,7 @@
             {% if usr  %}
             <br><a class="lnk-1" href="/timetables/edit/{{ conf.id }}/">Редактировать доклады конференции</a>
             <br><a class="lnk-1" href="/timetables/change_timecounts/{{ conf.id }}/">Редактировать продолжительность секций и докладов по умолчанию</a>
+            <br><a class="lnk-1" href="/timetables/data_get/{{ conf.id }}">Импортировать данные о докладах</a>
             {% endif %}
         </li>
     {% endfor %}
@@ -19,7 +20,7 @@
     <p>No conferences are available.</p>
 {% endif %}
 {% if usr  %}
-<a style="margin: 10px" class="lnk" href="/timetables/data_get/">Импортировать данные о докладах (настройки из файла config)</a>
+<a style="margin: 10px" class="lnk" href="/timetables/data_get/">Импортировать данные о докладах</a>
 
 <br><br><br>
 <a style="margin: 10px" class="lnk" href="/log_out/">Выйти</a>

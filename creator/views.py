@@ -12,7 +12,7 @@ import ConfigParser
 
 # Create your views here.
 from django.http import HttpResponse, HttpResponseRedirect
-from creator.models import report, conference, section, event, section_type, reports_time
+from creator.models import report, conference, section, event, section_type
 from creator.forms import ReportForm, ReportFormset, TypeForm, TypeFormset, RepTimeForm, LoginForm
 from django.views.decorators.csrf import csrf_exempt
 from datetime import time
@@ -145,11 +145,13 @@ def create_pdf(request, conference_id):
                     p.drawCentredString(int(PAGE_WIDTH) / 2.0, 785- step, i)
                     step = step+17
                 events = event.objects.filter(Conference=conference_id, Section_id=s.id).order_by('Section','order')
-                rep_dx = reports_time.objects.get(conference=conference_id)
+                #rep_dx = reports_time.objects.get(conference=conference_id)
                 if (s.Type.TName == u"Пленарные"):
-                    dx = rep_dx.plenary
+                    dx = c.plenary
+                    q_dx = c.p_questions
                 else:
-                    dx = rep_dx.sectional
+                    dx = c.sectional
+                    q_dx = c.s_questions
                 count = 0
                 current_time = s.StartTime + timedelta(hours=6)
                 for e in events:
@@ -164,6 +166,9 @@ def create_pdf(request, conference_id):
                         pt.append(current_time.strftime('%H:%M') + " - " + t.strftime('%H:%M') + u" | " + e.Report.RName)
                         sponsor = u" (" + e.Report.Sponsor + u")"
                         pt.append("                        " + e.Report.Reporter + sponsor)
+                        current_time = t
+                        t = t + timedelta(minutes=q_dx)
+                        pt.append(current_time.strftime('%H:%M') + " - " + t.strftime('%H:%M') + u" | " + u"Ответы на вопросы и обсуждение")
                         current_time = t
                         count = count + 1
                         for i in pt:
@@ -239,6 +244,7 @@ def edit_report(request, conference_id):
 @csrf_exempt
 @login_required
 def edit_time(request, conference_id):
+    conference_name = conference.objects.get(id=conference_id)
     if request.method=='POST':
         time = request.POST.items()
         print(time)
@@ -264,14 +270,14 @@ def edit_time(request, conference_id):
             new_t.time_default = count
             new_t.save()
         if (rst != 0):
-            new_t = reports_time.objects.get(conference=conference_id)
-            new_t.sectional = rst
-            new_t.save()
+            #new_t = reports_time.objects.get(conference=conference_id)
+            conference_name.sectional = rst
+            conference_name.save()
         if (rpt != 0):
-            new_t = reports_time.objects.get(conference=conference_id)
-            new_t.plenary = rpt
-            new_t.save()
-    conference_name = conference.objects.get(id=conference_id)
+            #new_t = reports_time.objects.get(conference=conference_id)
+            conference_name.plenary = rpt
+            conference_name.save()
+    #conference_name = conference.objects.get(id=conference_id)
     qs = section_type.objects.filter(Conference=conference_id).order_by('-TName')
     if (qs.count() == 0):
         formset = None
@@ -279,8 +285,8 @@ def edit_time(request, conference_id):
         formset = TypeFormset(queryset=qs)
         if formset.is_valid():
             formset.save()
-    rep = reports_time.objects.get(conference=conference_id)
-    tform = RepTimeForm(instance=rep)
+    #rep = reports_time.objects.get(conference=conference_id)
+    tform = RepTimeForm(instance=conference_name)
     context = {
         'formset': formset,
         'tform': tform,
@@ -327,7 +333,7 @@ def detail(request, conference_id):
     #r = report.objects.get(id=1)
     #form = ReportForm(instance=r)
     #formset = ReportFormset(initial=report)
-    reports_time_list = reports_time.objects.get(conference=conference_id)
+    #reports_time_list = reports_time.objects.get(conference=conference_id)
     usr = True
     if (str(request.user) == "AnonymousUser"):
         usr = False
@@ -339,20 +345,22 @@ def detail(request, conference_id):
                'section_list': section_list,
                'time_list': time_list,
                'types_list': types_list,
-               'reports_time_list': reports_time_list,
+               #'reports_time_list': reports_time_list,
                 'usr': usr
     }
     #return render(request, 'creator/detail.html', context)
     return render(request, 'creator/detail.html', context)
 
-
+@login_required
 def generate_first(request, conference_id):
     conf = conference.objects.get(pk=conference_id)
     section.objects.filter(Conference=conf).delete()
-    rt = reports_time.objects.get(conference=conf)
-    rt.plenary = 25
-    rt.sectional = 20
-    rt.save()
+    #rt = reports_time.objects.get(conference=conf)
+    conf.plenary = 25
+    conf.sectional = 20
+    conf.p_questions = 5
+    conf.s_questions = 5
+    conf.save()
     section_type.objects.filter(Conference=conf).delete()
 
     section_type.objects.create(TName=u"Организационные мероприятия", color="white", time_default=30, Conference=conf)
@@ -389,18 +397,20 @@ def generate_first(request, conference_id):
         if s.Type.TName in [u"Пленарные", u"Секционные"]:
             for i in range(1,6):
                 e = event.objects.filter(Conference=conf, Section=None).last()
-                print(e.Report)
                 if e is not None:
                     e.Section = s
                 else:
                     e = event.objects.create(Section=s, Conference=conf)
                 if s.Type.TName == u"Пленарные":
-                    e.y_pos = 2.75*rt.plenary
+                    e.y_pos = 2.75*(conf.plenary + conf.p_questions)
                 else:
-                    e.y_pos = 2.75*rt.sectional
+                    e.y_pos = 2.75*(conf.sectional + conf.s_questions)
+                    s.x_pos = 320
+                    s.save()
                 e.save()
 
-    return detail(request, conference_id)
+
+    return HttpResponseRedirect("/timetables/" + conference_id)
 
 
 @login_required
@@ -429,8 +439,9 @@ def save_width(request):
             if (width[w] > '0'):
                 sect = section.objects.get(id=w)
                 newwidth = width[w]
-                sect.x_pos = newwidth
-                sect.save(update_fields=['x_pos'])
+                if sect.x_pos != newwidth:
+                    sect.x_pos = newwidth
+                    sect.save(update_fields=['x_pos'])
 
     return HttpResponse('Success')
 
@@ -444,8 +455,9 @@ def save_height(request):
             if (height[h] > '0'):
                 sect = section.objects.get(id=h)
                 newheight = height[h]
-                sect.y_pos = newheight
-                sect.save(update_fields=['y_pos'])
+                if sect.y_pos != newheight:
+                    sect.y_pos = newheight
+                    sect.save(update_fields=['y_pos'])
     return HttpResponse('Success')
 
 
@@ -505,7 +517,7 @@ def save_reports_order(request):
                 count = 1
                 for item in s_order:
                     r_id = item[4:]
-                    if not ("sec" in r_id) and ("object" in r_id):
+                    if not ("sec" in r_id) and not ("Object" in r_id):
                         e = event.objects.get(Report=r_id)
                         e.order = count
                         e.save()
@@ -528,6 +540,8 @@ def change_timecount(request):
 #def vote(request, poll_id):
  #   return HttpResponse("You're voting on poll %s." % poll_id)
 
+url = u'http://newserv.srcc.msu.ru/PMA/'
+
 
 def unescape_entities(s):
     escaped = s
@@ -539,20 +553,13 @@ def unescape_entities(s):
 
 
 import os
-name = os.path.dirname(os.path.dirname(__file__)) +"\config.ini"
-Config = ConfigParser.ConfigParser()
-f = open(name, 'rb')
-f.readline()
-Config.readfp(f)
-cid = Config.get("inf", "conference_id")
-authorstable = Config.get("inf", "authors_table")
-reportstable = Config.get("inf", "reports_table")
-lgn = Config.get("inf", "login")
-psswd = Config.get("inf", "psswd")
-(username, password) = (lgn, psswd)
-db = Config.get("inf", "database")
-url = u'http://newserv.srcc.msu.ru/PMA/'
-database = db
+#name = os.path.dirname(os.path.dirname(__file__)) +"\config.ini"
+#Config = ConfigParser.ConfigParser()
+#f = open(name, 'rb')
+#f.readline()
+#Config.readfp(f)
+
+
 #authorstable = u"conf_pavt2014_appl_members"
 #reportstable = u"conf_pavt2014_thes_reports"
 #expertstable = u"conf_pavt2014_experts"
@@ -640,7 +647,16 @@ def now():
     return datetime.now().strftime(u'%Y%m%d%H%M%S')
 
 @login_required
-def data_get(request):
+def data_get(request, conference_id):
+    conference_name = conference.objects.get(id=conference_id)
+    authorstable = conference_name.authors_table
+    reportstable = conference_name.reports_table
+    lgn = conference_name.login
+    psswd = conference_name.password
+    (username, password) = (lgn, psswd)
+    db = conference_name.database
+
+    #database = db
     try:
         init_cookie_jar()
         if not login(username, password):
@@ -687,7 +703,7 @@ def data_get(request):
         header = []
         rownum = 0
         a_set =['id', 'title', 'xfield001', 'xfield008', 'xfield016', 'xfield005', 'authors']
-        conference_name = get_object_or_404(conference, pk=int(cid))
+        #conference_name = get_object_or_404(conference, pk=int(cid))
         for row in reader_r:
             if rownum == 0:
                 header = row
@@ -716,7 +732,7 @@ def data_get(request):
                         reporter = col
                     elif header[colnum] == 'xfield016':
                         topic = col
-                        if report.objects.filter(rid=int(rid)).count()==0:
+                        if report.objects.filter(rid=int(rid), Conference=conference_name).count() == 0:
                             rep = report(rid=int(rid), RName=title, Annotation=ann, Reporter=reporter, Topic=topic, Session=session, Organisation='unknown', Author=author, Sponsor='unknown', IsFinal=final, Conference=conference_name )
                             rep.save()
 

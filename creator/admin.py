@@ -1,59 +1,70 @@
+# -*- coding: utf-8 -*-
 from django.contrib import admin
 
 # Register your models here.
-from creator.models import report, conference, section, section_type, event, reports_time
+from creator.models import report, conference, section, section_type, event
 
 
 
 class report_admin(admin.ModelAdmin):
     fieldsets = [
-        ('RID',               {'fields': ['rid']}),
-        ('Conference',               {'fields': ['Conference']}),
-        ('Name',               {'fields': ['RName']}),
-        ('Annotation',   {'fields': ['Annotation']}),
-        ('Reporter',              {'fields': ['Reporter']}),
-        ('Topic',              {'fields': ['Topic']}),
-        ('Session',              {'fields': ['Session']}),
-        ('Organisation',              {'fields': ['Organisation']}),
-        ('Author',              {'fields': ['Author']}),
-        ('Sponsor',              {'fields': ['Sponsor']}),
-        ('IsFinal',              {'fields': ['IsFinal']}),
+        (u'ID доклада в системе "Агора"',       {'fields': ['rid']}),
+        (u'Конференция',                        {'fields': ['Conference']}),
+        (u'Название',                           {'fields': ['RName']}),
+        (u'Аннотация',                          {'fields': ['Annotation']}),
+        (u'Докладчик',                          {'fields': ['Reporter']}),
+        (u'Тематика',                           {'fields': ['Topic']}),
+        (u'Сессия',                             {'fields': ['Session']}),
+        (u'Организация',                        {'fields': ['Organisation']}),
+        (u'Авторы',                             {'fields': ['Author']}),
+        (u'Спорсор',                            {'fields': ['Sponsor']}),
+        (u'Получена финальная версия доклада',  {'fields': ['IsFinal']}),
     ]
-    list_display = ('RName', 'Reporter', 'Sponsor', 'Session')
+    list_display = ('RName', 'Conference', 'Reporter', 'Sponsor', 'Session')
 
 
 class conference_admin(admin.ModelAdmin):
+    readonly_fields=('id',)
     fieldsets = [
-        ('Name', {'fields': ['CName']}),
-        ('Start date', {'fields': ['StartDate']}),
-        ('End date', {'fields': ['EndDate']}),
-        ('daystart', {'fields': ['DayStart']}),
-        ('dayend', {'fields': ['DayEnd']}),
-        ('RepTime', {'fields': ['RepTime']})
+        (u'ID конференции',                         {'fields': ['id']}),
+        (u'Название',                               {'fields': ['CName']}),
+        (u'Дата начала',                            {'fields': ['StartDate']}),
+        (u'Дата окончания',                         {'fields': ['EndDate']}),
+        (u'Начало дня',                             {'fields': ['DayStart']}),
+        (u'Конец дня',                              {'fields': ['DayEnd']}),
+        (u'Продолжительность пленарных докладов',   {'fields': ['plenary']}),
+        (u'Ответы на вопросы к пленарным доклалам', {'fields': ['p_questions']}),
+        (u'Продолжительность секционных докладов',  {'fields': ['sectional']}),
+        (u'Ответы на вопросы к секционным докладам',{'fields': ['s_questions']}),
+        (u'Название базы данных в системе "Агора"', {'fields': ['database']}),
+        (u'Название таблицы с данными об авторах',  {'fields': ['authors_table']}),
+        (u'Название таблицы с данными о докладах',  {'fields': ['reports_table']}),
+        (u'Логин для доступа к БД "Агора"',         {'fields': ['login']}),
+        (u'Пароль для доступа к БД "Агора"',        {'fields': ['password']}),
     ]
     list_display = ('CName', 'StartDate', 'EndDate')
 
 
 class section_admin(admin.ModelAdmin):
     fieldsets = [
-        ('Name', {'fields': ['SName']}),
-        ('Person', {'fields': ['Person']}),
-        ('StartDateTime', {'fields': ['StartTime']}),
-        ('Conference', {'fields': ['Conference']}),
-        ('Place', {'fields': ['Place']}),
-        ('Type', {'fields': ['Type']}),
-        ('x', {'fields': ['x_pos']}),
-        ('y', {'fields': ['y_pos']}),
+        (u'Название',                                                   {'fields': ['SName']}),
+        (u'Председатель',                                               {'fields': ['Person']}),
+        (u'Дата и время начала',                                        {'fields': ['StartTime']}),
+        (u'Конференция',                                                {'fields': ['Conference']}),
+        (u'Место проведения',                                           {'fields': ['Place']}),
+        (u'Тип',                                                        {'fields': ['Type']}),
+        (u'Ширина блока в расписании (0 - по умолчанию типа секции)',   {'fields': ['x_pos']}),
+        (u'Высота блока в расписании (0 - по умолчанию типа секции)',   {'fields': ['y_pos']}),
     ]
     list_display = ('SName', 'Person', 'StartTime', 'Place', 'Conference')
 
 
 class section_type_admin(admin.ModelAdmin):
     fieldsets = [
-        ('Type', {'fields': ['TName']}),
-        ('color', {'fields': ['color']}),
-        ('time_default', {'fields': ['time_default']}),
-        ('Conference',               {'fields': ['Conference']})
+        (u'Тип',                            {'fields': ['TName']}),
+        (u'Цвет',                           {'fields': ['color']}),
+        (u'Продолжительность по умолчанию', {'fields': ['time_default']}),
+        (u'Конференция',                    {'fields': ['Conference']})
 
     ]
     list_display = ('TName', 'color')
@@ -61,24 +72,16 @@ class section_type_admin(admin.ModelAdmin):
 
 class event_admin(admin.ModelAdmin):
     fieldsets = [
-        ('Conference', {'fields': ['Conference']}),
-        ('Section', {'fields': ['Section']}),
-        ('order', {'fields': ['order']}),
-        ('x', {'fields': ['x_pos']}),
-        ('y', {'fields': ['y_pos']}),
-        ('Report', {'fields': ['Report']})
+        (u'Конференция',                                    {'fields': ['Conference']}),
+        (u'Секция',                                         {'fields': ['Section']}),
+        (u'Номер по порядку в секции',                      {'fields': ['order']}),
+        (u'Ширина блока в расписании (0 - по умолчанию)',   {'fields': ['x_pos']}),
+        (u'Ширина блока в расписании (0 - по умолчанию)',   {'fields': ['y_pos']}),
+        (u'Связанный доклад',                               {'fields': ['Report']})
     ]
     list_display = ('Report', 'Conference', 'Section', 'order')
 
 
-class reports_time_admin(admin.ModelAdmin):
-    fieldsets = [
-        ('plenary', {'fields': ['plenary']}),
-        ('sectional', {'fields': ['sectional']})
-    ]
-    list_display = ('plenary', 'sectional')
-
-admin.site.register(reports_time, reports_time_admin)
 admin.site.register(report, report_admin)
 admin.site.register(conference, conference_admin)
 admin.site.register(section, section_admin)
