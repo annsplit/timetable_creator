@@ -363,11 +363,15 @@ def generate_first(request, conference_id):
     conf.save()
     section_type.objects.filter(Conference=conf).delete()
 
-    section_type.objects.create(TName=u"Организационные мероприятия", color="white", time_default=30, Conference=conf)
-    section_type.objects.create(TName=u"Обеды и кофе-брейки", color="ghostwhite", time_default=30, Conference=conf)
-    section_type.objects.create(TName=u"Секционные", color="#CEF6D8", time_default=117, Conference=conf)
-    section_type.objects.create(TName=u"Пленарные", color="mediumpurple", time_default=141, Conference=conf)
-    section_type.objects.create(TName=u"Стендовые", color="58ACFA", time_default=60, Conference=conf)
+    section_type.objects.create(TName=u"Организационные мероприятия", color="white", time_default=60, Conference=conf)
+    section_type.objects.create(TName=u"Обеды", color="ghostwhite", time_default=60, Conference=conf)
+    section_type.objects.create(TName=u"Секционные", color="#CEF6D8", time_default=96, Conference=conf)
+    section_type.objects.create(TName=u"Пленарные", color="mediumpurple", time_default=106, Conference=conf)
+    section_type.objects.create(TName=u"Стендовые", color="#58ACFA", time_default=120, Conference=conf)
+    section_type.objects.create(TName=u"Тьюториалы и семинары", color="green", time_default=180, Conference=conf)
+    section_type.objects.create(TName=u"Кофе-брейки", color="ghostwhite", time_default=30, Conference=conf)
+    section_type.objects.create(TName=u"Выставки", color="#F6D8CE", time_default=120, Conference=conf)
+    section_type.objects.create(TName=u"Торжественный ужин", color="#F3E2A9", time_default=120, Conference=conf)
 
     events_list = event.objects.filter(Conference=conf)
     for e in events_list:
@@ -377,19 +381,42 @@ def generate_first(request, conference_id):
     day = conf.StartDate
 
     for i in range(0, diff.days+1):
-        section.objects.create(SName=u"Обед", Conference=conf, Place=u"Столовая", Type=section_type.objects.get(TName=u"Обеды и кофе-брейки"), StartTime=datetime.combine(day,time(14,0)))
-        section.objects.create(SName=u"Кофе-брейк", Conference=conf, Place=u"Столовая", Type=section_type.objects.get(TName=u"Обеды и кофе-брейки"), StartTime=datetime.combine(day,time(17,0)))
-        if i in range(1, diff.days):
-            section.objects.create(SName=u"Пленарные доклады", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Пленарные"), StartTime=datetime.combine(day,time(11,0)))
-            section.objects.create(SName=u"Секционные доклады", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Секционные"), StartTime=datetime.combine(day,time(15,0)))
-            section.objects.create(SName=u"Секционные доклады", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Секционные"), StartTime=datetime.combine(day,time(15,0)))
-        elif i==0:
-            section.objects.create(SName=u"Торжественное открытие", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Организационные мероприятия"), StartTime=datetime.combine(day,time(10,0)))
-            section.objects.create(SName=u"Регистрация участников", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Организационные мероприятия"), StartTime=datetime.combine(day,time(11,0)))
-        else:
-            section.objects.create(SName=u"Секция стендовых докладов", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Стендовые"), StartTime=datetime.combine(day,time(16,0)))
+        section.objects.create(SName=u"Обед", Conference=conf, Place=u"Столовая", Type=section_type.objects.get(TName=u"Обеды"), StartTime=datetime.combine(day,time(14,0)))
+        #section.objects.create(SName=u"Кофе-брейк", Conference=conf, Place=u"Столовая", Type=section_type.objects.get(TName=u"Кофе-брейки"), StartTime=datetime.combine(day,time(17,0)))
+        if i == 0:
+            section.objects.create(SName=u"Тьюториал", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Тьюториалы и семинары"), StartTime=datetime.combine(day,time(13,0)))
+            section.objects.create(SName=u"Семинар", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Тьюториалы и семинары"), StartTime=datetime.combine(day,time(17,0)))
+            section.objects.create(SName=u"Регистрация участников", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Организационные мероприятия"), StartTime=datetime.combine(day,time(9,0)), y_pos=1155)
+        elif i == 2:
+            section.objects.create(SName=u"Пленарные доклады", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Пленарные"), StartTime=datetime.combine(day,time(10,0)))
+            section.objects.create(SName=u"Кофе-брейк", Conference=conf, Place=u"Столовая", Type=section_type.objects.get(TName=u"Кофе-брейки"), StartTime=datetime.combine(day,time(11,30)))
+            section.objects.create(SName=u"Пленарные доклады", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Пленарные"), StartTime=datetime.combine(day,time(12,0)))
+            section.objects.create(SName=u"Фотографирование участников конференции", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Организационные мероприятия"), StartTime=datetime.combine(day,time(13,30)), y_pos=83)
+            section.objects.create(SName=u"Выставка", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Выставки"), StartTime=datetime.combine(day,time(15,0)))
+            section.objects.create(SName=u"Секция стендовых докладов", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Стендовые"), StartTime=datetime.combine(day,time(15,0)))
+            section.objects.create(SName=u"Торжественный ужин", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Торжественный ужин"), StartTime=datetime.combine(day,time(18,0)))
+        elif i == diff.days:
+            section.objects.create(SName=u"Пленарные доклады", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Пленарные"), StartTime=datetime.combine(day,time(10,0)))
+            section.objects.create(SName=u"Кофе-брейк", Conference=conf, Place=u"Столовая", Type=section_type.objects.get(TName=u"Кофе-брейки"), StartTime=datetime.combine(day,time(11,30)))
+            section.objects.create(SName=u"Секция A", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Секционные"), StartTime=datetime.combine(day,time(12,0)))
+            section.objects.create(SName=u"Секция B", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Секционные"), StartTime=datetime.combine(day,time(12,0)))
+            section.objects.create(SName=u"Секция A", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Секционные"), StartTime=datetime.combine(day,time(15,30)))
+            section.objects.create(SName=u"Молодежная сессия", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Секционные"), StartTime=datetime.combine(day,time(15,30)))
+            section.objects.create(SName=u"Кофе-брейк", Conference=conf, Place=u"Столовая", Type=section_type.objects.get(TName=u"Кофе-брейки"), StartTime=datetime.combine(day,time(17,0)))
+            section.objects.create(SName=u"Закрытие конференции", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Организационные мероприятия"), StartTime=datetime.combine(day,time(18,0)))
+        elif i == diff.days+1:
             section.objects.create(SName=u"Торжественное закрытие конференции", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Организационные мероприятия"), StartTime=datetime.combine(day,time(18,0)))
             section.objects.create(SName=u"Фотографирование", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Организационные мероприятия"), StartTime=datetime.combine(day,time(19,0)))
+        else:
+            section.objects.create(SName=u"Регистрация участников", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Организационные мероприятия"), StartTime=datetime.combine(day,time(9,0)))
+            section.objects.create(SName=u"Пленарные доклады", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Пленарные"), StartTime=datetime.combine(day,time(10,15)))
+            section.objects.create(SName=u"Кофе-брейк", Conference=conf, Place=u"Столовая", Type=section_type.objects.get(TName=u"Кофе-брейки"), StartTime=datetime.combine(day,time(11,45)))
+            section.objects.create(SName=u"Пленарные доклады", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Пленарные"), StartTime=datetime.combine(day,time(12,15)))
+            section.objects.create(SName=u"Секция A", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Секционные"), StartTime=datetime.combine(day,time(16,0)))
+            section.objects.create(SName=u"Секция B", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Секционные"), StartTime=datetime.combine(day,time(16,0)))
+            section.objects.create(SName=u"Кофе-брейк", Conference=conf, Place=u"Столовая", Type=section_type.objects.get(TName=u"Кофе-брейки"), StartTime=datetime.combine(day,time(17,20)))
+            section.objects.create(SName=u"Секция A", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Секционные"), StartTime=datetime.combine(day,time(17,50)))
+            section.objects.create(SName=u"Молодежная сессия", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Секционные"), StartTime=datetime.combine(day,time(17,50)))
         day = day + timedelta(days=1)
 
     section_list = section.objects.filter(Conference=conf)
