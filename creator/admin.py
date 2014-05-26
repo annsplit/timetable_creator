@@ -18,7 +18,7 @@ class report_admin(admin.ModelAdmin):
         (u'Организация',                        {'fields': ['Organisation']}),
         (u'Авторы',                             {'fields': ['Author']}),
         (u'Спорсор',                            {'fields': ['Sponsor']}),
-        (u'Получена финальная версия доклада',  {'fields': ['IsFinal']}),
+        (u'Получена финальная версия статьи',   {'fields': ['IsFinal']}),
     ]
     list_display = ('RName', 'Conference', 'Reporter', 'Sponsor', 'Session')
 
@@ -33,9 +33,9 @@ class conference_admin(admin.ModelAdmin):
         (u'Начало дня',                             {'fields': ['DayStart']}),
         (u'Конец дня',                              {'fields': ['DayEnd']}),
         (u'Продолжительность пленарных докладов',   {'fields': ['plenary']}),
-        (u'Ответы на вопросы к пленарным доклалам', {'fields': ['p_questions']}),
+        (u'Время на вопросы к пленарным докладам',  {'fields': ['p_questions']}),
         (u'Продолжительность секционных докладов',  {'fields': ['sectional']}),
-        (u'Ответы на вопросы к секционным докладам',{'fields': ['s_questions']}),
+        (u'Время на вопросы к пленарным докладам',  {'fields': ['s_questions']}),
         (u'Название базы данных в системе "Агора"', {'fields': ['database']}),
         (u'Название таблицы с данными об авторах',  {'fields': ['authors_table']}),
         (u'Название таблицы с данными о докладах',  {'fields': ['reports_table']}),
@@ -62,7 +62,7 @@ class section_admin(admin.ModelAdmin):
 class section_type_admin(admin.ModelAdmin):
     fieldsets = [
         (u'Тип',                            {'fields': ['TName']}),
-        (u'Цвет',                           {'fields': ['color']}),
+        (u'Цвет секций в расписании',       {'fields': ['color']}),
         (u'Продолжительность по умолчанию', {'fields': ['time_default']}),
         (u'Конференция',                    {'fields': ['Conference']})
 
