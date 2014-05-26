@@ -696,18 +696,50 @@ def data_get(request, conference_id):
                 return (record for record in contents.split('$$'))
 
         #clean = codecs.open(filenames[1], 'rbU', encoding=u'koi8-r', errors=u'replace').read().replace('\n', '')
-        reader = unicode_csv_reader(records(filenames[1]),  delimiter='|', lineterminator='$$')
+        reader_a = unicode_csv_reader(records(filenames[1]),  delimiter='|', lineterminator='$$')
         reader_r = unicode_csv_reader(records(filenames[0]),  delimiter='|', lineterminator='$$')
 
-        new_report = []
+        authors = []
         header = []
         rownum = 0
-        a_set =['id', 'title', 'xfield001', 'xfield008', 'xfield016', 'xfield005', 'authors']
-        #conference_name = get_object_or_404(conference, pk=int(cid))
-        for row in reader_r:
+        for row in reader_a:
             if rownum == 0:
                 header = row
                 print(header)
+                rownum+=1
+            else:
+                colnum = 0
+                aid = u""
+                surname = u""
+                name = u""
+                patronymic = u""
+                organisation = u""
+                sponsor = u""
+                for col in row:
+                    if header[colnum] == 'id':
+                        aid = col
+                        #print(col)
+                    if header[colnum] == 'familiya':
+                        surname = col
+                    elif header[colnum] == 'imya':
+                        name = col
+                    elif header[colnum] == 'otchestvo':
+                        patronymic = col
+                    elif header[colnum] == 'afield020':
+                        sponsor = col
+                        new_author = [aid, name[:1] + u"." + patronymic[:1] + u". " + surname, organisation, sponsor]
+                        authors.append(new_author)
+                    elif header[colnum] == 'afield001':
+                        organisation = col
+                    colnum +=1
+
+
+        header = []
+        rownum = 0
+        for row in reader_r:
+            if rownum == 0:
+                header = row
+                #print(header)
                 rownum+=1
             else:
                 colnum = 0
@@ -719,11 +751,13 @@ def data_get(request, conference_id):
                 session = u""
                 author = u""
                 final = u""
+                organisation = u""
+                sponsor = u""
 
                 for col in row:
                     if header[colnum] == 'id':
                         rid = col
-                        print(col)
+                        #print(col)
                     if header[colnum] == 'title':
                         title = col
                     elif header[colnum] == 'xfield001':
@@ -733,15 +767,26 @@ def data_get(request, conference_id):
                     elif header[colnum] == 'xfield016':
                         topic = col
                         if report.objects.filter(rid=int(rid), Conference=conference_name).count() == 0:
-                            rep = report(rid=int(rid), RName=title, Annotation=ann, Reporter=reporter, Topic=topic, Session=session, Organisation='unknown', Author=author, Sponsor='unknown', IsFinal=final, Conference=conference_name )
+                            rep = report(rid=int(rid), RName=title, Annotation=ann, Reporter=reporter, Topic=topic, Session=session, Organisation=organisation, Author=author, Sponsor=sponsor, IsFinal=final, Conference=conference_name )
                             rep.save()
-
                             ev = event(Conference=conference_name, Report=rep)
                             ev.save()
                     elif header[colnum] == 'xfield005':
                         session = col
                     elif header[colnum] == 'authors':
-                        author = col
+                        authors_ids = col
+                        for a in authors:
+                            if u"." + str(a[0]) + u"." in authors_ids:
+                                if author =="":
+                                    author = a[1]
+                                else:
+                                    author = author + ", " + a[1]
+                                organisation = a[2]
+                                if u"понсор" in a[3]:
+                                    sponsor = organisation
+                                else:
+                                    sponsor = ""
+                        print(authors_ids)
                     elif header[colnum] == 'confirm':
                         final = col
 
