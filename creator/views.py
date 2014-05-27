@@ -357,7 +357,7 @@ def generate_first(request, conference_id):
     section.objects.filter(Conference=conf).delete()
     #rt = reports_time.objects.get(conference=conf)
     conf.plenary = 25
-    conf.sectional = 20
+    conf.sectional = 15
     conf.p_questions = 5
     conf.s_questions = 5
     conf.save()
@@ -376,25 +376,27 @@ def generate_first(request, conference_id):
     events_list = event.objects.filter(Conference=conf)
     for e in events_list:
         e.Section = None
+        e.y_pos = 0
+        e.x_pos = 0
 
     diff = conf.EndDate - conf.StartDate
     day = conf.StartDate
 
     for i in range(0, diff.days+1):
-        section.objects.create(SName=u"Обед", Conference=conf, Place=u"Столовая", Type=section_type.objects.get(TName=u"Обеды"), StartTime=datetime.combine(day,time(14,0)))
-        #section.objects.create(SName=u"Кофе-брейк", Conference=conf, Place=u"Столовая", Type=section_type.objects.get(TName=u"Кофе-брейки"), StartTime=datetime.combine(day,time(17,0)))
         if i == 0:
-            section.objects.create(SName=u"Тьюториал", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Тьюториалы и семинары"), StartTime=datetime.combine(day,time(13,0)))
-            section.objects.create(SName=u"Семинар", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Тьюториалы и семинары"), StartTime=datetime.combine(day,time(17,0)))
-            section.objects.create(SName=u"Регистрация участников", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Организационные мероприятия"), StartTime=datetime.combine(day,time(9,0)), y_pos=1155)
+            section.objects.create(SName=u"Тьюториал", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Тьюториалы и семинары"), StartTime=datetime.combine(day,time(13,0)), x_pos=300)
+            section.objects.create(SName=u"Семинар", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Тьюториалы и семинары"), StartTime=datetime.combine(day,time(17,0)), x_pos=300)
+            section.objects.create(SName=u"Регистрация участников", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Организационные мероприятия"), StartTime=datetime.combine(day,time(9,0)), y_pos=1172, x_pos=300)
+            section.objects.create(SName=u"Обед", Conference=conf, Place=u"Столовая", Type=section_type.objects.get(TName=u"Обеды"), StartTime=datetime.combine(day,time(14,0)), x_pos=300)
         elif i == 2:
             section.objects.create(SName=u"Пленарные доклады", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Пленарные"), StartTime=datetime.combine(day,time(10,0)))
             section.objects.create(SName=u"Кофе-брейк", Conference=conf, Place=u"Столовая", Type=section_type.objects.get(TName=u"Кофе-брейки"), StartTime=datetime.combine(day,time(11,30)))
             section.objects.create(SName=u"Пленарные доклады", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Пленарные"), StartTime=datetime.combine(day,time(12,0)))
             section.objects.create(SName=u"Фотографирование участников конференции", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Организационные мероприятия"), StartTime=datetime.combine(day,time(13,30)), y_pos=83)
-            section.objects.create(SName=u"Выставка", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Выставки"), StartTime=datetime.combine(day,time(15,0)))
-            section.objects.create(SName=u"Секция стендовых докладов", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Стендовые"), StartTime=datetime.combine(day,time(15,0)))
+            section.objects.create(SName=u"Выставка", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Выставки"), StartTime=datetime.combine(day,time(15,0)), x_pos=300)
+            section.objects.create(SName=u"Секция стендовых докладов", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Стендовые"), StartTime=datetime.combine(day,time(15,0)), x_pos=300)
             section.objects.create(SName=u"Торжественный ужин", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Торжественный ужин"), StartTime=datetime.combine(day,time(18,0)))
+            section.objects.create(SName=u"Обед", Conference=conf, Place=u"Столовая", Type=section_type.objects.get(TName=u"Обеды"), StartTime=datetime.combine(day,time(14,0)))
         elif i == diff.days:
             section.objects.create(SName=u"Пленарные доклады", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Пленарные"), StartTime=datetime.combine(day,time(10,0)))
             section.objects.create(SName=u"Кофе-брейк", Conference=conf, Place=u"Столовая", Type=section_type.objects.get(TName=u"Кофе-брейки"), StartTime=datetime.combine(day,time(11,30)))
@@ -404,9 +406,11 @@ def generate_first(request, conference_id):
             section.objects.create(SName=u"Молодежная сессия", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Секционные"), StartTime=datetime.combine(day,time(15,30)))
             section.objects.create(SName=u"Кофе-брейк", Conference=conf, Place=u"Столовая", Type=section_type.objects.get(TName=u"Кофе-брейки"), StartTime=datetime.combine(day,time(17,0)))
             section.objects.create(SName=u"Закрытие конференции", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Организационные мероприятия"), StartTime=datetime.combine(day,time(18,0)))
+            section.objects.create(SName=u"Обед", Conference=conf, Place=u"Столовая", Type=section_type.objects.get(TName=u"Обеды"), StartTime=datetime.combine(day,time(14,0)))
         elif i == diff.days+1:
             section.objects.create(SName=u"Торжественное закрытие конференции", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Организационные мероприятия"), StartTime=datetime.combine(day,time(18,0)))
             section.objects.create(SName=u"Фотографирование", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Организационные мероприятия"), StartTime=datetime.combine(day,time(19,0)))
+            section.objects.create(SName=u"Обед", Conference=conf, Place=u"Столовая", Type=section_type.objects.get(TName=u"Обеды"), StartTime=datetime.combine(day,time(14,0)))
         else:
             section.objects.create(SName=u"Регистрация участников", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Организационные мероприятия"), StartTime=datetime.combine(day,time(9,0)))
             section.objects.create(SName=u"Пленарные доклады", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Пленарные"), StartTime=datetime.combine(day,time(10,15)))
@@ -417,23 +421,28 @@ def generate_first(request, conference_id):
             section.objects.create(SName=u"Кофе-брейк", Conference=conf, Place=u"Столовая", Type=section_type.objects.get(TName=u"Кофе-брейки"), StartTime=datetime.combine(day,time(17,20)))
             section.objects.create(SName=u"Секция A", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Секционные"), StartTime=datetime.combine(day,time(17,50)))
             section.objects.create(SName=u"Молодежная сессия", Conference=conf, Place=u"Установите место", Type=section_type.objects.get(TName=u"Секционные"), StartTime=datetime.combine(day,time(17,50)))
+            section.objects.create(SName=u"Обед", Conference=conf, Place=u"Столовая", Type=section_type.objects.get(TName=u"Обеды"), StartTime=datetime.combine(day,time(14,0)))
         day = day + timedelta(days=1)
 
     section_list = section.objects.filter(Conference=conf)
     for s in section_list:
-        if s.Type.TName in [u"Пленарные", u"Секционные"]:
-            for i in range(1,6):
+        if s.Type.TName == u"Пленарные":
+            for i in range(1, 4):
                 e = event.objects.filter(Conference=conf, Section=None).last()
                 if e is not None:
                     e.Section = s
                 else:
                     e = event.objects.create(Section=s, Conference=conf)
-                if s.Type.TName == u"Пленарные":
-                    e.y_pos = 2.75*(conf.plenary + conf.p_questions)
+                e.y_pos = (conf.plenary + conf.p_questions) * 2.75
+                e.save()
+        if s.Type.TName == u"Секционные":
+            for i in range(1, 5):
+                e = event.objects.filter(Conference=conf, Section=None).last()
+                if e is not None:
+                    e.Section = s
                 else:
-                    e.y_pos = 2.75*(conf.sectional + conf.s_questions)
-                    s.x_pos = 320
-                    s.save()
+                    e = event.objects.create(Section=s, Conference=conf)
+                e.y_pos = (conf.sectional + conf.s_questions) * 2.75
                 e.save()
 
 

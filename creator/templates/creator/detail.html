@@ -7,147 +7,70 @@
 
     <link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
 
-
-
-    <style>
-
-
-  </style>
-
-
-
-
 <script>
-    var sections_array = {};
-    var sections_width = {};
-    var sections_height = {};
 
-    var reports_array = {};
-    var reports_width = {};
-    var reports_height = {};
-    var sec_time_def = {};
-    var section_types = {};
-    {% for t in types_list %}
-        sec_time_def[{{ t.id }}] = 2.75 * {{ t.time_default }};
-    {% endfor %}
-    rep_p = {{ reports_time_list.plenary }};
-    rep_p *=2.75;
-    rep_s = {{ reports_time_list.sectional }};
-    rep_s *=2.75;
-    {% for section in section_list %}
-        {%  if section.StartTime == None %}
-            sections_array[{{section.id}}] = "";
-        {% else %}
-            sections_array[{{section.id}}] = "{{ section.StartTime|date:"Y-m-d H:m:s" }}";
-        {% endif %}
+</script>
+<script>
 
-        section_types[{{ section.id }}] = {{ section.Type_id }};
-        {% if section.Type.TName == "Пленарные" %}
-            plenary_id = {{ section.Type_id }}
-        {% elif section.Type.TName == "Секционные"%}
-            sectional_id= {{ section.Type_id }}
-        {% endif %}
-        sections_width[{{ section.id }}] = {{ section.x_pos }};
-        sections_height[{{ section.id }}] = {{ section.y_pos }};
-    {% endfor %}
+    document.ready($(function(){
+    alert("kdkdkd");
+        var selector;
+        var t = 2.77;
+        var t_cur = 1;
+        {% for s in section_list %}
+            selector = $("#"+ "{{ s.id }}");
+            selector.css("background-color", "{{ s.Type.color }}");
+            {% if s.x_pos != 0 %}
+                selector.css("width", {{ s.x_pos }});
+            {% endif %}
+            {% if s.y_pos != 0 %}
+                selector.css("height", {{ s.y_pos }});
+            {% else %}
+                t_cur = t* {{ s.Type.time_default }};
+                selector.css("height", t_cur);
+                t_cur = 1;
+            {% endif %}
+            {% if s.StartTime != None %}
+                {% if s.Type.TName == "Пленарные" or s.Type.TName == "Секционные" %}
+                    selector.closest(".time").addClass("start");
+                    selector.addClass("dropped_section");
+                {% endif %}
+            {% endif %}
+        {% endfor %}
 
-    {% for report in message_list %}
-        {% if  report.Section_id  == None %}
-            reports_array[{{ report.id }}]  = 0;
-        {% else %}
-            reports_array[{{ report.id }}] = {{ report.Section_id }}
-        {% endif %}
-        reports_width[{{ report.id }}] = {{ report.x_pos }};
-        reports_height[{{ report.id }}] = {{ report.y_pos }};
-    {% endfor %}
+        {% for r in message_list %}
+            selector = $("#r_"+{{ r.id }});
+            {% if r.x_pos != 0 %}
+                selector.css("width", {{ r.x_pos }});
+            {% endif %}
+            {% if r.y_pos != 0 %}
+                selector.css("height", {{ r.y_pos }});
+            {% else %}
+                {% if r.Section.Type == "Пленарные" %}
+                    t_cur = (t - 0.03) * {{ conference_name.plenary }};
+                {% else %}
+                    t_cur = (t - 0.03) * {{ conference_name.sectional }};
+                {% endif %}
+                selector.css("height", t_cur);
+                t_cur = 1;
+            {% endif %}
 
-    var colors_array = {};
-    {% for section in section_list %}
-        colors_array[{{ section.id }}] = "{{ section.Type.color }}";
-    {% endfor %}
-
-    {% if usr %}
-
-
+        {% endfor %}
+    })
+    );
+/*
     $(function() {
-        $( "#messageList, .timegrid, .timedrop" ).sortable({
+        $("#messageList, .timegrid, .timedrop" ).sortable({
             connectWith: ".connectedSortable",
-            placeholder: "ui-state-highlight",
-            start: function(event, ui) {
-                var drag_id = ui.item.attr('id');
-                if (drag_id.indexOf("r") == -1){
-                    past_time = $(this).closest(".time");
-                    ui.item.data('past_time', past_time);
-                }
-                ui.item.data('drag_id', drag_id);
-
-            },
-            update: function(event, ui){
-
-                var drag_id = ui.item.data('drag_id');
-                var dest = event.target.id;
-                if (drag_id.indexOf("r") > -1){
-
-                    var sid = $(this).closest(".sid_class").attr('id');
-                    var c = $(this).closest(".sid_class").attr('class');
-                    var report_id = drag_id;
-                    report_id = report_id.replace("r_","");
-                    int_report_id = +report_id;
-                    if (c.indexOf("resizablePlenary") > -1){
-                        $('#'+drag_id).css("height", rep_p);
-                        reports_height[int_report_id] = rep_p;
-                    }
-                    if (c.indexOf("resizableSectional") > -1){
-                        $('#'+drag_id).css("height", rep_s);
-                        reports_height[int_report_id] = rep_s;
-                    }
-                    if (sid[0] == "m"){
-                        sid = 0;
-                    }
-
-                    for (var i=1; i<Object.keys(reports_array).length+1; i++)
-                        if (i == int_report_id ){
-                            reports_array[i] = sid;
-                        }
-                }
-                else {
-                    var past = ui.item.data('past_time');
-                    $(past).removeClass("start");
-                    $("#t_sec"+drag_id).empty();
-                    $("#"+drag_id).removeClass("dropped_section");
-                    if (dest == "messageList"){
-                        var time = "";
-                        var date_source = "";
-                    }
-
-                    else{
-                        if (section_types[drag_id] == plenary_id  || section_types[drag_id] == sectional_id){
-                            $(this).closest(".time").addClass("start");
-                            $("#"+drag_id).addClass("dropped_section");
-                        }
-                        var time=$(this).closest("div.time").find(".timetext").text();
-
-                        var date_source=$('#'+drag_id).closest("div.time").closest("div.dayOfWeek").find(".dayHeader").val();
-
-
-                    }
-                    for (var i=1; i<=Object.keys(sections_array).length+1; i++)
-                        if (i == drag_id ){
-                            if (time!= "")
-                                sections_array[i] = date_source + " " + time + ":00" ;
-
-                            else
-                                sections_array[i] = "";
-                            $("#t_sec"+drag_id).prepend("(" + time+ ")")
-                        }
-
-                }
-            }
-        }).disableSelection();
+            placeholder: "ui-state-highlight"
+        });
+        $("#messageList, .timegrid, .timedrop" ).disableSelection();
     });
 
-    function saveTimetable(){
 
+
+    function saveTimetable(){
+        {% comment %}
         //for (var i=0; i<7; i++){
           //  if (i==0)
             $.ajax({
@@ -262,80 +185,28 @@
                     error: function() {
                         alert("Ошибка при сохранении");
                     }
-                });
+                });{% endcomment %}
             }
-
-        //}
 
 
 
     jQuery(function() {
-        jQuery(" .resizablePlenary, .resizableSectional, .resizableSimple").resizable({
+        jQuery(".resizablePlenary, .resizableSectional, .resizableSimple").resizable({
             minWidth: "300",
-            minHeight: "27",
-            stop: function(){
-                var width = $(this).width();
-                var height = $(this).height();
-                var section_id=$(this).find("input[type=hidden]").val();
-                for (var i=1; i<=Object.keys(sections_array).length+1; i++)
-                    if (i == section_id ){
-                        sections_width[i] = width;
-                        sections_height[i] = height;
-                    }
-            }
+            minHeight: "27"
         });
     });
 
     jQuery(function() {
         jQuery(".message").resizable({
-            minWidth: "300",
-            stop: function(){
-                var width = $(this).width();
-                var height = $(this).height();
-                var report_id = $(this).attr('id');
-                report_id = report_id.replace("r_","");
-                int_report_id = +report_id;
-                for (var i=1; i<Object.keys(reports_array).length+1; i++)
-                    if (i == int_report_id){
-                        reports_width[i] = width;
-                        reports_height[i] = height;
-                    }
-            }
+            minWidth: "300"
         });
     });
-    {% endif %}
-    document.ready($(function(){
-        for (var i=1; i<=Object.keys(sections_array).length+1; i++){
-            v = i.toString();
-            if (sections_array[i] != "" && (section_types[i] == plenary_id  || section_types[i] == sectional_id)){
-                $("#"+i).closest(".time").addClass("start");
-                $("#"+i).addClass("dropped_section");
-            }
-            //$("#"+i).( "<p>Test</p>" );
-
-            $('#'+v).css("background-color", colors_array[i]);
-            if (sections_width[i] > 0)
-                $('#'+v).css("width", sections_width[i]);
-            if (sections_height[i] > 0)
-                $('#'+v).css("height", sections_height[i]);
-            else
-                $('#'+v).css("height", sec_time_def[section_types[i]]);
-
-        }
-        for (var i=1; i<Object.keys(reports_array).length+1; i++){
-            v = i.toString();
-            if (reports_width[i] > 0)
-                $('#r_'+v).css("width", reports_width[i]);
-            if (reports_height[i] > 0)
-                $('#r_'+v).css("height", reports_height[i]);
-
-        }
-
-    })
-    );
 
 
 
+
+*/
 
 
 </script>
@@ -385,7 +256,7 @@
                         <br>
                         {% for report in message_list %}
                             {% if report.Section_id == section.id %}
-                                <li class="message" id="r{{ report.id }}">
+                                <li class="message" id="r_{{ report.id }}">
                                 {{ report.Report.RName }}
                                 <br><i>{{ report.Report.Reporter }}</i>
                                 </li>
@@ -406,7 +277,7 @@
                          <br>
                          {% for report in message_list %}
                              {% if report.Section_id == section.id %}
-                                 <li class="message" id="r{{ report.id }}">
+                                 <li class="message" id="r_{{ report.id }}">
                                      {{ report.Report.RName }}
                                      <br><i>{{ report.Report.Reporter }}</i>
                                  </li>
