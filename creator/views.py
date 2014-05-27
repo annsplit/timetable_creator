@@ -573,7 +573,7 @@ def save(request, conference_id):
         param = "%Y-%m-%d %H:%M"
         conf = conference.objects.get(id=conference_id)
         section_list = section.objects.filter(Conference=conf)
-        """for s in section_list:
+        for s in section_list:
             for sect in changes["positions"]:
                 if int(sect) == s.id:
                     if changes["positions"][sect] == "":
@@ -592,10 +592,10 @@ def save(request, conference_id):
                         s.y_pos = changes["height"][hei][:-2]
             print(s.id)
             s.save()
-"""
+
         event_list = event.objects.filter(Conference=conf)
         for e in event_list:
-            """for wid in changes["width"]:
+            for wid in changes["width"]:
                 if wid[0] == "r":
                     print(wid)
                     if int(wid[1:]) == e.id:
@@ -605,7 +605,7 @@ def save(request, conference_id):
                 if hei[0] == "r":
                     if int(hei[1:]) == e.id:
                         e.y_pos = changes["height"][hei][:-2]
-                        """
+
             is_changed = False
             sect = ""
             for o in changes["order"]:
