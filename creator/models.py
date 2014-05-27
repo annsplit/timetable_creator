@@ -65,7 +65,7 @@ class section(models.Model):
     def __unicode__(self):  # Python 3: def __str__(self):
         from datetime import datetime
         param = "%Y-%m-%d %H:%M"
-        return u"%s, %s" % (self.SName, datetime.strftime(self.StartTime, param))
+        return u"%s" % self.SName
     class Meta:
         verbose_name = u"секцию"
         verbose_name_plural = u"Секции"

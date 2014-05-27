@@ -9,7 +9,7 @@ from django.http import Http404
 from django.template import RequestContext, loader
 from django.forms.formsets import formset_factory
 import ConfigParser
-
+import cgi
 # Create your views here.
 from django.http import HttpResponse, HttpResponseRedirect
 from creator.models import report, conference, section, event, section_type
@@ -377,7 +377,8 @@ def generate_first(request, conference_id):
     for e in events_list:
         e.Section = None
         e.y_pos = 0
-        e.x_pos = 0
+        e.x_pos = 300
+        e.save()
 
     diff = conf.EndDate - conf.StartDate
     day = conf.StartDate
@@ -434,6 +435,7 @@ def generate_first(request, conference_id):
                 else:
                     e = event.objects.create(Section=s, Conference=conf)
                 e.y_pos = (conf.plenary + conf.p_questions) * 2.75
+                e.x_pos = 300
                 e.save()
         if s.Type.TName == u"Секционные":
             for i in range(1, 5):
@@ -443,6 +445,7 @@ def generate_first(request, conference_id):
                 else:
                     e = event.objects.create(Section=s, Conference=conf)
                 e.y_pos = (conf.sectional + conf.s_questions) * 2.75
+                e.x_pos = 300
                 e.save()
 
 
@@ -451,7 +454,7 @@ def generate_first(request, conference_id):
 
 @login_required
 @csrf_exempt
-def save(request):
+def save_(request):
     if request.method == 'POST':
         times = request.POST
         for t in times:
@@ -558,6 +561,80 @@ def save_reports_order(request):
                         e.order = count
                         e.save()
                         count = count + 1
+    return HttpResponse('Success')
+
+
+@login_required
+@csrf_exempt
+def save(request, conference_id):
+    import json
+    if request.method == 'POST':
+        changes = json.loads(request.body)
+        param = "%Y-%m-%d %H:%M"
+        conf = conference.objects.get(id=conference_id)
+        section_list = section.objects.filter(Conference=conf)
+        """for s in section_list:
+            for sect in changes["positions"]:
+                if int(sect) == s.id:
+                    if changes["positions"][sect] == "":
+                        newtime = None
+                    else:
+                        newtime = datetime.strptime(changes["positions"][sect], param)
+                    s.StartTime = newtime
+            for wid in changes["width"]:
+                if wid[0] == "s":
+                    if int(wid[1:]) == s.id:
+
+                        s.x_pos = changes["width"][wid][:-2]
+            for hei in changes["height"]:
+                if hei[0] == "s":
+                    if int(hei[1:]) == s.id:
+                        s.y_pos = changes["height"][hei][:-2]
+            print(s.id)
+            s.save()
+"""
+        event_list = event.objects.filter(Conference=conf)
+        for e in event_list:
+            """for wid in changes["width"]:
+                if wid[0] == "r":
+                    print(wid)
+                    if int(wid[1:]) == e.id:
+                        print(int(wid[1:]))
+                        e.x_pos = changes["width"][wid][:-2]
+            for hei in changes["height"]:
+                if hei[0] == "r":
+                    if int(hei[1:]) == e.id:
+                        e.y_pos = changes["height"][hei][:-2]
+                        """
+            is_changed = False
+            sect = ""
+            for o in changes["order"]:
+                s_order = changes["order"][o].split("&")
+                count = 0
+                for item in s_order:
+                    r_id = item[4:]
+                    if "s" not in r_id:
+                        if int(r_id) == e.id:
+                            print(s_order)
+                            e.order = count
+                            e.save()
+                            is_changed = True
+                            sect = s_order[0][4:]
+                        count = count + 1
+
+
+
+            if not is_changed:
+                e.Section = None
+            else:
+                e.Section = section.objects.get(id=int(sect[3:]))
+            print(e.id)
+            e.save()
+
+
+            """
+                #if round(changes["width"][wid], 1) == 1:
+                    #print("ddd")"""
     return HttpResponse('Success')
 
 

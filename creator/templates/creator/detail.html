@@ -12,8 +12,47 @@
 </script>
 <script>
 
+    $(function() {
+        $("#messageList, .timegrid, .timedrop, .plenary, .sectional" ).sortable({
+            connectWith: ".connectedSortable",
+            placeholder: "ui-state-highlight",
+            start: function(event, ui) {
+                var drag_id = ui.item.attr('id');
+                if (drag_id.indexOf("r") == -1){
+                    past_time = $(this).closest(".time");
+                    ui.item.data('past_time', past_time);
+                }
+                ui.item.data('drag_id', drag_id);
+            },
+            update: function(event, ui){
+                var drag_id = ui.item.data('drag_id');
+                var dest = event.target.id;
+                if (drag_id.indexOf("r") == -1){
+                    var past = ui.item.data('past_time');
+                    $(past).removeClass("start");
+                    $("#t_sec"+drag_id).empty();
+                    $("#t_sec"+drag_id).prepend("(" + time+ ")");
+                    $("#"+drag_id).removeClass("dropped_section");
+                    var time=$(this).closest("div.time").find(".timetext").text();
+                    }
+            }
+        }).disableSelection();
+    });
+
+    jQuery(function() {
+        jQuery(".resizablePlenary, .resizableSectional, .resizableSimple").resizable({
+            minWidth: "300",
+            minHeight: "27"
+        });
+    });
+
+    jQuery(function() {
+        jQuery(".message").resizable({
+            minWidth: "300"
+        });
+    });
+
     document.ready($(function(){
-    alert("kdkdkd");
         var selector;
         var t = 2.77;
         var t_cur = 1;
@@ -58,18 +97,56 @@
         {% endfor %}
     })
     );
-/*
-    $(function() {
-        $("#messageList, .timegrid, .timedrop" ).sortable({
-            connectWith: ".connectedSortable",
-            placeholder: "ui-state-highlight"
-        });
-        $("#messageList, .timegrid, .timedrop" ).disableSelection();
-    });
+
+
 
 
 
     function saveTimetable(){
+        var pos = {};
+        var wid = {};
+        var hei = {};
+        var ord = {};
+        var changes = {
+            positions: pos,
+            width: wid,
+            height: hei,
+            order: ord
+        };
+
+        {%  for s in section_list %}
+            var selector =$('#'+{{ s.id }});
+            {% if s.Type.TName == "Пленарные" or s.Type.TName == "Секционные" %}
+                ord[{{ s.id }}] = $("#sec" + {{ s.id }}).sortable('serialize');
+            {% endif %}
+            if (selector.parent("ul").attr("id") != "messageList"){//?????????????????????????????????????????????????
+                var date_source=selector.closest("div.time").closest("div.dayOfWeek").find(".dayHeader").val();
+                var time=selector.closest("div.time").find(".timetext").text();
+                pos[{{ s.id }}] = date_source + " " + time;
+            }
+            else{
+                pos[{{ s.id }}] = "";
+            }
+            wid["s" +{{ s.id }}] = selector.css("width");
+            hei["s" +{{ s.id }}] = selector.css("height");
+        {% endfor %}
+        {% for r in message_list %}
+            var selector_r =$('#r_'+{{ r.id }});
+            wid["r" +{{ r.id }}] = selector_r.css("width");
+            hei["r" +{{ r.id }}] = selector_r.css("height");
+        {% endfor %}
+        $.ajax({
+            type: 'POST',
+            contentType: "application/json",
+            data: JSON.stringify(changes),
+            url: '/timetables/save/{{ conference_name.id }}/',
+            success: function() {
+                alert("Временная сетка успешно сохранена");
+            },
+            error: function() {
+                alert("Ошибка при сохранении");
+            }
+        });
         {% comment %}
         //for (var i=0; i<7; i++){
           //  if (i==0)
@@ -190,23 +267,12 @@
 
 
 
-    jQuery(function() {
-        jQuery(".resizablePlenary, .resizableSectional, .resizableSimple").resizable({
-            minWidth: "300",
-            minHeight: "27"
-        });
-    });
-
-    jQuery(function() {
-        jQuery(".message").resizable({
-            minWidth: "300"
-        });
-    });
 
 
 
 
-*/
+
+
 
 
 </script>
