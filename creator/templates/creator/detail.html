@@ -29,15 +29,23 @@
                 var dest = event.target.id;
                 if (drag_id.indexOf("r") == -1){
                     var past = ui.item.data('past_time');
-                    $(past).removeClass("start");
+                    if (past.find(".sid_class").text() == "")
+                        $(past).removeClass("start");
+                    $('#'+drag_id).removeClass("dropped_section");
                     var time=$(this).closest("div.time").find(".timetext").text();
                     if (dest == "messageList"){
                         time = "";
                     }
+                    else{
+                        if ($('#'+drag_id).attr("class").indexOf("Sectional") > -1 || $('#'+drag_id).attr("class").indexOf("Plenary") > -1){
+                            $('#'+drag_id).closest(".time").addClass("start");
+                            $('#'+drag_id).addClass("dropped_section");
+                        }
+                    }
                     $("#t_sec"+drag_id).empty();
                     $("#t_sec"+drag_id).prepend("(" + time+ ")");
-                    $("#"+drag_id).removeClass("dropped_section");
-                    }
+
+                }
                 else{
                     var c = $(this).closest(".sid_class").attr('class');
                     if (c.indexOf("resizablePlenary") > -1){
