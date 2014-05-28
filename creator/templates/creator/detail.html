@@ -19,7 +19,7 @@
             start: function(event, ui) {
                 var drag_id = ui.item.attr('id');
                 if (drag_id.indexOf("r") == -1){
-                    past_time = $(this).closest(".time");
+                    var past_time = $(this).closest(".time");
                     ui.item.data('past_time', past_time);
                 }
                 ui.item.data('drag_id', drag_id);
@@ -30,11 +30,25 @@
                 if (drag_id.indexOf("r") == -1){
                     var past = ui.item.data('past_time');
                     $(past).removeClass("start");
+                    var time=$(this).closest("div.time").find(".timetext").text();
+                    if (dest == "messageList"){
+                        time = "";
+                    }
                     $("#t_sec"+drag_id).empty();
                     $("#t_sec"+drag_id).prepend("(" + time+ ")");
                     $("#"+drag_id).removeClass("dropped_section");
-                    var time=$(this).closest("div.time").find(".timetext").text();
                     }
+                else{
+                    var c = $(this).closest(".sid_class").attr('class');
+                    if (c.indexOf("resizablePlenary") > -1){
+                        var h = "{{ conference_name.plenary }}" * 2.74 + "{{ conference_name.p_questions }}" * 2.74;
+                        $('#'+drag_id).css("height", h);
+                    }
+                    if (c.indexOf("resizableSectional") > -1){
+                        var h = "{{ conference_name.sectional }}" * 2.74+ "{{ conference_name.s_questions }}" * 2.74;
+                        $('#'+drag_id).css("height", h);
+                    }
+                }
             }
         }).disableSelection();
     });
@@ -119,7 +133,7 @@
             {% if s.Type.TName == "Пленарные" or s.Type.TName == "Секционные" %}
                 ord[{{ s.id }}] = $("#sec" + {{ s.id }}).sortable('serialize');
             {% endif %}
-            if (selector.parent("ul").attr("id") != "messageList"){//?????????????????????????????????????????????????
+            if (selector.parent("ul").attr("id") != "messageList"){
                 var date_source=selector.closest("div.time").closest("div.dayOfWeek").find(".dayHeader").val();
                 var time=selector.closest("div.time").find(".timetext").text();
                 pos[{{ s.id }}] = date_source + " " + time;
@@ -147,123 +161,7 @@
                 alert("Ошибка при сохранении");
             }
         });
-        {% comment %}
-        //for (var i=0; i<7; i++){
-          //  if (i==0)
-            $.ajax({
-                type: 'POST',
-                traditional: true,
-                data: sections_array,
-                url: '/timetables/save/',
-                success: function() {
-                    //setTimeout(saveWidth, 4000);
-                    saveWidth();
-                },
-                error: function() {
-                    alert("Ошибка при сохранении положений");
-                }
-            });
     }
-            //if (i==1)
-            function saveWidth(){
-                $.ajax({
-                type: 'POST',
-                traditional: true,
-                data: sections_width,
-                url: '/timetables/save_width/',
-                success: function() {
-                    //setTimeout(saveHeight, 4000);
-                    saveHeight();
-                },
-                error: function() {
-                    alert("Ошибка при сохранении ширины");
-                }
-            });
-            }
-            //if (i==2)
-            function saveHeight(){
-                $.ajax({
-                type: 'POST',
-                traditional: true,
-                data: sections_height,
-                url: '/timetables/save_height/',
-                success: function() {
-                    //setTimeout(saveReports, 4000);
-                    saveReports();
-                },
-                error: function() {
-                    alert("Ошибка при сохранении высоты");
-                }
-            });
-            }
-
-            //if (i==3){
-            function saveReports(){
-                $.ajax({
-                type: 'POST',
-                traditional: true,
-                data: reports_array,
-                url: '/timetables/save_reports/',
-                success: function() {
-                    //setTimeout(saveRWidth, 4000);
-                    saveRWidth();
-                },
-                error: function() {
-                    alert("Ошибка при сохранении докладов");
-                }
-            });
-            }
-            //if (i==4)
-            function saveRWidth(){
-                $.ajax({
-                type: 'POST',
-                traditional: true,
-                data: reports_width,
-                url: '/timetables/save_reports_width/',
-                success: function() {
-                    //setTimeout(saveRHeight, 4000);
-                    saveRHeight();
-                },
-                error: function() {
-                    alert("Ошибка при сохранении докладов ширина");
-                }
-            });
-            }
-            //if (i==5)
-            function saveRHeight(){
-                $.ajax({
-                type: 'POST',
-                traditional: true,
-                data: reports_height,
-                url: '/timetables/save_reports_height/',
-                success: function() {
-                    //setTimeout(saveOrder, 4000);
-                    saveOrder();
-                },
-                error: function() {
-                    alert("Ошибка при сохранении докладов высота");
-                }
-            });
-            }
-            //if (i==6){
-            function saveOrder(){
-                var reports_order = {};
-                {%  for s in section_list %}
-                    reports_order[{{ s.id }}] = $("#sec" + {{ s.id }}).sortable('serialize');
-                {% endfor %}
-                $.ajax({
-                    type: 'POST',
-                    traditional: true,
-                    data: reports_order,
-                    url: '/timetables/save_reports_order/',
-                    success: function() {
-                        alert("Временная сетка успешно сохранена");
-                    },
-                    error: function() {
-                        alert("Ошибка при сохранении");
-                    }
-                });{% endcomment %}
-            }
 
 
 
@@ -356,7 +254,7 @@
             {% elif section.StartTime == None %}
                 <li class="resizableSimple sid_class" id="{{ section.id }}">
                     <ul class="timegrid simple">
-                        {{ section.SName }}
+                        {{ section.SName }}<div style="display: inline-block" id="t_sec{{ section.id }}">({{ section.StartTime|time:"H:i" }})</div>
                         <br><i>{{ section.Person }}</i>
                         <input type="hidden" class="my" name="SID" value="{{ section.id }}">
                     </ul>
@@ -436,7 +334,7 @@
                         {% else %}
                             <li class="resizableSimple sid_class" id="{{ section.id }}">
                                 <ul class="timegrid simple">
-                                    {{ section.SName }}
+                                    {{ section.SName }}<div style="display: inline-block" id="t_sec{{ section.id }}">({{ section.StartTime|time:"H:i" }})</div>
                                     <br><i>{{ section.Person }}</i>
                                     <input type="hidden" class="my" name="SID" value="{{ section.id }}">
                                 </ul>

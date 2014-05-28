@@ -454,118 +454,6 @@ def generate_first(request, conference_id):
 
 @login_required
 @csrf_exempt
-def save_(request):
-    if request.method == 'POST':
-        times = request.POST
-        for t in times:
-            my = section.objects.get(id=t)
-            param = "%Y-%m-%d %H:%M:%S"
-            if (times[t] == ""):
-                newtime = None
-            else:
-                newtime = datetime.strptime(times[t], param)
-            my.StartTime = newtime
-            my.save(update_fields=['StartTime'])
-    return HttpResponse('Success')
-
-
-@login_required
-@csrf_exempt
-def save_width(request):
-    if request.method == 'POST':
-        width = request.POST
-        for w in width:
-            if (width[w] > '0'):
-                sect = section.objects.get(id=w)
-                newwidth = width[w]
-                if sect.x_pos != newwidth:
-                    sect.x_pos = newwidth
-                    sect.save(update_fields=['x_pos'])
-
-    return HttpResponse('Success')
-
-
-@login_required
-@csrf_exempt
-def save_height(request):
-    if request.method == 'POST':
-        height = request.POST
-        for h in height:
-            if (height[h] > '0'):
-                sect = section.objects.get(id=h)
-                newheight = height[h]
-                if sect.y_pos != newheight:
-                    sect.y_pos = newheight
-                    sect.save(update_fields=['y_pos'])
-    return HttpResponse('Success')
-
-
-@login_required
-@csrf_exempt
-def save_reports(request):
-    if request.method == 'POST':
-        positions = request.POST
-        for p in positions:
-            if (positions[p] > '0'):
-                newpos = positions[p]
-            else:
-                newpos = None
-            rep = event.objects.get(id=p)
-            if (rep.Section_id != newpos):
-                rep.Section_id = newpos
-                rep.save(update_fields=['Section_id'])
-    return HttpResponse('Success')
-
-
-@login_required
-@csrf_exempt
-def save_reports_width(request):
-    if request.method == 'POST':
-        width = request.POST
-        for w in width:
-            if (width[w] > '0'):
-                rep = event.objects.get(id=w)
-                newwidth = width[w]
-                rep.x_pos = newwidth
-                rep.save(update_fields=['x_pos'])
-    return HttpResponse('Success')
-
-
-@login_required
-@csrf_exempt
-def save_reports_height(request):
-    if request.method == 'POST':
-        height = request.POST
-        for h in height:
-            if (height[h] > '0'):
-                rep = event.objects.get(id=h)
-                newheight = height[h]
-                rep.y_pos = newheight
-                rep.save(update_fields=['y_pos'])
-    return HttpResponse('Success')
-
-
-@login_required
-@csrf_exempt
-def save_reports_order(request):
-    if request.method == 'POST':
-        order = request.POST.items()
-        if order:
-            for o in order:
-                s_order = o[1].split("&")
-                count = 1
-                for item in s_order:
-                    r_id = item[4:]
-                    if not ("sec" in r_id) and not ("Object" in r_id):
-                        e = event.objects.get(Report=r_id)
-                        e.order = count
-                        e.save()
-                        count = count + 1
-    return HttpResponse('Success')
-
-
-@login_required
-@csrf_exempt
 def save(request, conference_id):
     import json
     if request.method == 'POST':
@@ -621,20 +509,12 @@ def save(request, conference_id):
                             is_changed = True
                             sect = s_order[0][4:]
                         count = count + 1
-
-
-
             if not is_changed:
                 e.Section = None
             else:
                 e.Section = section.objects.get(id=int(sect[3:]))
             print(e.id)
             e.save()
-
-
-            """
-                #if round(changes["width"][wid], 1) == 1:
-                    #print("ddd")"""
     return HttpResponse('Success')
 
 
@@ -927,4 +807,4 @@ def data_get(request, conference_id):
         print u'Dying!'
         sys.exit(1)
 
-    return HttpResponse('okay')
+    return HttpResponseRedirect("/timetables/")
