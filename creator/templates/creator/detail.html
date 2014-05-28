@@ -205,17 +205,15 @@
 Список докладов и секций:
 {% if message_list or section_list %}
     <ul id="messageList" class="connectedSortable box_class">
-
-        {% for report in message_list %}
-            {% if report.Section_id == None %}
-                <li class="message" id="r_{{ report.id }}">
-                    {{ report.Report.RName }}
-                    <br><i>{{ report.Report.Reporter }}</i>
-                </li>
-            {% endif %}
-
-
-
+        {% for t in topic_list %}
+            {% for report in message_list %}
+                {% if report.Section_id == None and report.Report.Topic == t %}
+                    <li class="message" id="r_{{ report.id }}">
+                        <p style="background-color: lightskyblue; margin-top: -0.5px; margin-bottom: -0.5px" >{{ report.Report.Topic }}</p>
+                        {{ report.Report.RName }} | {{ report.Report.Author }}
+                    </li>
+                {% endif %}
+            {% endfor %}
         {% endfor %}
 
         {% for section in section_list %}
@@ -229,8 +227,8 @@
                         {% for report in message_list %}
                             {% if report.Section_id == section.id %}
                                 <li class="message" id="r_{{ report.id }}">
-                                {{ report.Report.RName }}
-                                <br><i>{{ report.Report.Reporter }}</i>
+                                <p style="background-color: lightskyblue; margin-top: -0.5px; margin-bottom: -0.5px" >{{ report.Report.Topic }}</p>
+                                {{ report.Report.RName }} | {{ report.Report.Author }}
                                 </li>
                             {% endif %}
                         {% endfor %}
@@ -250,8 +248,8 @@
                          {% for report in message_list %}
                              {% if report.Section_id == section.id %}
                                  <li class="message" id="r_{{ report.id }}">
-                                     {{ report.Report.RName }}
-                                     <br><i>{{ report.Report.Reporter }}</i>
+                                     <p style="background-color: lightskyblue; margin-top: -0.5px; margin-bottom: -0.5px" >{{ report.Report.Topic }}</p>
+                                     {{ report.Report.RName }} | {{ report.Report.Author }}
                                  </li>
                              {% endif %}
                          {% endfor %}
@@ -307,8 +305,8 @@
                                     {% for report in message_list %}
                                         {% if report.Section_id == section.id %}
                                             <li class="message" id="r_{{ report.id }}">
-                                                {{ report.Report.RName }}
-                                                <br><i>{{ report.Report.Reporter }}</i>
+                                                <p style="background-color: lightskyblue; margin-top: -0.5px; margin-bottom: -0.5px" >{{ report.Report.Topic }}</p>
+                                                {{ report.Report.RName }} | {{ report.Report.Author }}
                                             </li>
                                         {% endif %}
                                     {% endfor %}
@@ -329,8 +327,8 @@
                                     {% for report in message_list %}
                                         {% if report.Section_id == section.id %}
                                             <li class="message" id="r_{{ report.id }}">
-                                                {{ report.Report.RName }}
-                                                <br><i>{{ report.Report.Reporter }}</i>
+                                                <p style="background-color: lightskyblue; margin-top: -0.5px; margin-bottom: -0.5px" >{{ report.Report.Topic }}</p>
+                                                {{ report.Report.RName }} | {{ report.Report.Author }}
                                             </li>
                                         {% endif %}
                                     {% endfor %}

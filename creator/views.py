@@ -302,7 +302,15 @@ def edit_time(request, conference_id):
 
 def detail(request, conference_id):
     message_list = event.objects.filter(Conference=conference_id).order_by('Section', 'order')
-    types_list = section_type.objects.all()
+    messagebox_list = report.objects.filter(Conference=conference_id).order_by('Topic')
+    topic = messagebox_list.first().Topic
+    topic_list = []
+    topic_list.append(topic)
+    for m in messagebox_list:
+        if m.Topic != topic:
+            topic = m.Topic
+            topic_list.append(topic)
+    #types_list = section_type.objects.all()
     conference_name = get_object_or_404(conference, pk=conference_id)
 
     date_list = []
@@ -344,7 +352,7 @@ def detail(request, conference_id):
                #'formset':formset,
                'section_list': section_list,
                'time_list': time_list,
-               'types_list': types_list,
+               'topic_list': topic_list,
                #'reports_time_list': reports_time_list,
                 'usr': usr
     }
@@ -377,7 +385,7 @@ def generate_first(request, conference_id):
     for e in events_list:
         e.Section = None
         e.y_pos = 0
-        e.x_pos = 300
+        e.x_pos = 350
         e.save()
 
     diff = conf.EndDate - conf.StartDate
@@ -429,23 +437,25 @@ def generate_first(request, conference_id):
     for s in section_list:
         if s.Type.TName == u"Пленарные":
             for i in range(1, 4):
-                e = event.objects.filter(Conference=conf, Section=None).last()
+                e = event.objects.filter(Conference=conf, Section=None).order_by('Report__Topic').last()
                 if e is not None:
                     e.Section = s
                 else:
                     e = event.objects.create(Section=s, Conference=conf)
                 e.y_pos = (conf.plenary + conf.p_questions) * 2.75
-                e.x_pos = 300
+                e.x_pos = 350
                 e.save()
         if s.Type.TName == u"Секционные":
+            s.x_pos = 360
+            s.save()
             for i in range(1, 5):
-                e = event.objects.filter(Conference=conf, Section=None).last()
+                e = event.objects.filter(Conference=conf, Section=None).order_by('Report__Topic').last()
                 if e is not None:
                     e.Section = s
                 else:
                     e = event.objects.create(Section=s, Conference=conf)
                 e.y_pos = (conf.sectional + conf.s_questions) * 2.75
-                e.x_pos = 300
+                e.x_pos = 350
                 e.save()
 
 
